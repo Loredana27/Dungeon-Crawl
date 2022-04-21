@@ -2,15 +2,13 @@ package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
 
-public class Player extends Actor {
-    public Player(Cell cell) {
+public class Sword extends Actor{
+    public Sword(Cell cell) {
         super(cell);
-        attack = 5;
     }
 
+    @Override
     public String getTileName() {
-        return "player";
+        return "sword";
     }
-
-
 }
