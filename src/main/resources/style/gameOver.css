@@ -1,0 +1,22 @@
+.gameOverPane{
+    -fx-background-image: url("/gameover2.png");
+    -fx-min-width: 600px;
+    -fx-min-height: 300px;
+}
+
+.gameOverPane ButtonBar{
+    -fx-alignment: center;
+    -fx-margin: 80px;
+    -fx-gap-start-and-end: 100px;
+}
+
+.gameOverPane Button{
+    -fx-background-color: darkgrey;
+    -fx-background-radius: 20px;
+    -fx-end-margin: 80px;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-padding: 5px;
+    -fx-effect: dropshadow( three-pass-box, white, 5.0, 0.0, 0.0, 0.0);
+    -fx-cursor: hand;
+}

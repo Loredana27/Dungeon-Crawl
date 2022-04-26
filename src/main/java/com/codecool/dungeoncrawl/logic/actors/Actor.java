@@ -22,7 +22,8 @@ public abstract class Actor implements Drawable {
             if(nextCell.getActor()!= null) {
                 System.out.println(nextCell.getActor().getTileName());
                 if (nextCell.getActor().getTileName().equals("sword")) {
-                    cell.setType(CellType.FLOOR);
+                    cell.setActor(null);
+                    nextCell.setActor(this);
                     setAttack(attack + 3);
                 } else if (nextCell.getActor().getTileName().equals("skeleton")) {
                     while(true){

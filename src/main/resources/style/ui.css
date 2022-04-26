@@ -1,0 +1,35 @@
+.mainPain{
+    -fx-background-color: #0d0d0d;
+
+}
+
+.GridPane Label{
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bolder;
+    -fx-font-size: 15px;
+}
+
+.ExitContainer{
+    -fx-vgap: 20;
+    -fx-hgap: 70;
+    -fx-padding: 0 0 20 0;
+}
+
+Button{
+    /*-fx-background-insets: 20, 100,20,100;*/
+    -fx-start-margin: 100px;
+    -fx-min-width: 60px;
+    -fx-background-color: black;
+    -fx-effect: dropshadow( three-pass-box, white, 3.0, 0.0, 0.0, 0.0);
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+}
+
+Button:hover{
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box, #fa7e00, 10.0, 0.0, 0.0, 0.0);
+}

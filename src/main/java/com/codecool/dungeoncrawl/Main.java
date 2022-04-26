@@ -4,22 +4,28 @@ import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -27,6 +33,9 @@ import java.util.Optional;
 public class Main extends Application {
     Stage mainStage;
     Scene scene;
+    GridPane inventory;
+    GridPane itemsToCollect;
+    Button exitButton;
     GameMap map = MapLoader.loadMap();
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
@@ -43,33 +52,18 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage){
         mainStage = primaryStage;
-        GridPane ui = new GridPane();
-        ui.setPrefWidth(200);
-        ui.setPadding(new Insets(10));
 
-        ui.add(new Label("Health: "), 0, 0);
-        ui.add(healthLabel, 1, 0);
-        ui.add(new Label("Attack damage: "),0,1);
-        ui.add(attackLabel,1,1);
-
-
-        BorderPane borderPane = new BorderPane();
-
-        borderPane.setCenter(canvas);
-        borderPane.setRight(ui);
-
-        Scene scene = new Scene(borderPane);
-        mainStage.setScene(scene);
-        refresh();
-        scene.setOnKeyPressed(this::onKeyPressed);
+        initUI();
 
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png")));
         primaryStage.getIcons().add(icon);
         primaryStage.setTitle("Dungeon Crawl - By L.A");
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
+        System.out.println(keyEvent.getCode());
         if (gameRunning) {
             switch (keyEvent.getCode()) {
                 case UP:
@@ -89,10 +83,64 @@ public class Main extends Application {
                     refresh();
                     break;
             }
-            if(map.getPlayer().getHealth()<=0) {
-                gameRunning = false;
-                showGameOver();
-            }
+            checkForEnd();
+        }
+    }
+
+    private void initUI(){
+        BorderPane uiContainer = new BorderPane();
+        uiContainer.getStyleClass().add("mainPain");
+        uiContainer.getStylesheets().add(getClass().getResource("/style/ui.css").toExternalForm());
+
+        GridPane ui = new GridPane();
+        ui.getStyleClass().add("GridPane");
+        ui.setPrefWidth(200);
+        ui.setPadding(new Insets(10));
+
+        ui.add(new Label("Health: "), 0, 0);
+        ui.add(healthLabel, 1, 0);
+        Label attackLabelText = new Label("Attack damage: ");
+        ui.add(attackLabelText,0,1);
+        GridPane.setConstraints(attackLabelText,0,1,2,1);
+        ui.add(attackLabel,2,1);
+
+
+
+        GridPane exitContainer = new GridPane();
+        exitContainer.getStyleClass().add("ExitContainer");
+
+        exitButton = new Button("Exit");
+        exitButton.setOnAction(MouseEvent -> exit());
+
+        exitContainer.add(exitButton, 1,0);
+
+        uiContainer.setCenter(ui);
+        uiContainer.setBottom(exitContainer);
+
+
+        BorderPane borderPane = new BorderPane();
+
+        borderPane.setCenter(canvas);
+        borderPane.setRight(uiContainer);
+
+        scene = new Scene(borderPane);
+        mainStage.setScene(scene);
+
+        canvas.setFocusTraversable(true);
+        uiContainer.setFocusTraversable(true);
+        scene.addEventHandler(KeyEvent.KEY_PRESSED,this::onKeyPressed);
+        refresh();
+    }
+
+
+    private void exit(){
+        System.exit(1);
+    }
+
+    private void checkForEnd(){
+        if(map.getPlayer().getHealth()<=0) {
+            gameRunning = false;
+            showGameOver();
         }
     }
 
@@ -117,15 +165,29 @@ public class Main extends Application {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION,null);
         alert.setTitle("You lost!");
         alert.setHeaderText(null);
-        alert.setGraphic(new ImageView(this.getClass().getResource("/gameover2.png").toString()));
+        alert.setContentText("");
+        alert.setGraphic(null);
         alert.initOwner(mainStage);
+
+        alert.getButtonTypes().clear();
+        ButtonType buttonYes = new ButtonType("Yes!", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonNo = new ButtonType("No...Sorry", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().add(0,buttonYes);
+        alert.getButtonTypes().add(1,buttonNo);
+
+        System.out.println();
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/style/gameOver.css").toExternalForm());
+        dialogPane.getStyleClass().add("gameOverPane");
         Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == ButtonType.OK){
+        if(result.isPresent() && result.get() == buttonYes){
             try {
                 restartGame();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        } else if (result.get() == buttonNo) {
+            System.exit(1);
         }
     }
 
