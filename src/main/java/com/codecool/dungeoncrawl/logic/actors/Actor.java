@@ -3,6 +3,7 @@ package com.codecool.dungeoncrawl.logic.actors;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.Drawable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class Actor implements Drawable{
@@ -11,7 +12,7 @@ public abstract class Actor implements Drawable{
 
     protected int attack;
 
-//    private ArrayList<Actor> items;
+    private ArrayList<Actor> enemies;
 
     private HashMap<String,Integer> items;
 
@@ -19,6 +20,7 @@ public abstract class Actor implements Drawable{
         this.cell = cell;
         this.cell.setActor(this);
         items = new HashMap<>();
+        setNeighborEnemies();
     }
 
     public void move(int dx, int dy) {
@@ -34,34 +36,61 @@ public abstract class Actor implements Drawable{
                         this.addItem(nextCell.getActor().getTileName());
                         cell.setActor(null);
                         nextCell.setActor(this);
+                        cell = nextCell;
                         break;
                     case "skeleton":
-                        while(true){
-                            nextCell.getActor().isAttacked(this.attack);
-                            if(nextCell.getActor().getHealth() <= 0) break;
-                            this.isAttacked(nextCell.getActor().getAttack());
-                            if(this.health <= 0) break;
-                        }
-                        if(this.health <= 0){
-                            cell.setActor(null);
-                        }
-                        else{
-                            cell.setActor(null);
-                            nextCell.setActor(this);
-                        }
+                        this.isAttacked(nextCell.getActor().getAttack());
                         break;
                     case "door":
                         cell.setActor(null);
                         nextCell.setActor(this);
+                        cell = nextCell;
                         break;
-
                 }
             }
             else{
                 cell.setActor(null);
                 nextCell.setActor(this);
+                cell = nextCell;
             }
-            cell = nextCell;
+            setNeighborEnemies();
+        }
+    }
+
+
+    private void setNeighborEnemies(){
+        enemies = new ArrayList<>();
+        for(int dx = -1; dx <= 1; dx++)
+            for(int dy = -1; dy <= 1; dy++) {
+                if(dx != 0 || dy != 0){
+                    try {
+                        Actor enemy = cell.getNeighbor(dx, dy).getActor();
+                        if (enemy != null)
+                            switch (enemy.getTileName()) {
+                                case "skeleton":
+                                    enemies.add(enemy);
+                            }
+                    }catch (IndexOutOfBoundsException e){
+
+                    }
+                }
+            }
+    }
+
+    public boolean startFight(Actor enemy){
+        while(true){
+            enemy.isAttacked(this.attack);
+            if(enemy.getHealth() <= 0) break;
+            this.isAttacked(enemy.getAttack());
+            if(this.health <= 0) break;
+        }
+        if(this.health <= 0){
+            cell.setActor(null);
+            return false;
+        }
+        else{
+            enemy.getCell().setActor(null);
+            return true;
         }
     }
 
@@ -110,5 +139,9 @@ public abstract class Actor implements Drawable{
 
     public void setItems(HashMap<String, Integer> items) {
         this.items = items;
+    }
+
+    public ArrayList<Actor> getEnemies() {
+        return enemies;
     }
 }

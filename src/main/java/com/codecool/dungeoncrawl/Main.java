@@ -74,6 +74,13 @@ public class Main extends Application {
     private void onKeyPressed(KeyEvent keyEvent) {
         if (gameRunning) {
             switch (keyEvent.getCode()) {
+                case SPACE:
+                    map.getPlayer().getEnemies().forEach(enemy -> {
+                        if(map.getPlayer().getHealth() > 0)
+                            gameRunning = map.getPlayer().startFight(enemy);
+                    });
+                    refresh();
+                    break;
                 case UP:
                     if(map.getPlayer().getCell().getNeighbor(0, -1).getActor() != null) {
                         String item = map.getPlayer().getCell().getNeighbor(0, -1).getActor().getTileName();
