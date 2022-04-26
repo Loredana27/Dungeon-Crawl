@@ -1,6 +1,7 @@
 package com.codecool.dungeoncrawl.logic;
 
 import com.codecool.dungeoncrawl.logic.actors.Actor;
+import com.codecool.dungeoncrawl.logic.actors.Enemy;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ public class GameMap {
 
     private HashMap<String,Integer> availableItems;
 
+    private ArrayList<Enemy> gameAI;
+
     private Player player;
 
     public GameMap(int width, int height, CellType defaultCellType) {
@@ -20,6 +23,7 @@ public class GameMap {
         this.height = height;
         cells = new Cell[width][height];
         this.availableItems = new HashMap<>();
+        this.gameAI = new ArrayList<>();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 cells[x][y] = new Cell(this, x, y, defaultCellType);
@@ -51,6 +55,18 @@ public class GameMap {
         if(availableItems.containsKey(item))
             availableItems.put(item,availableItems.get(item)+1);
         else availableItems.put(item,1);
+    }
+
+    public void addAI(Enemy ai){
+        gameAI.add(ai);
+    }
+
+    public void removeEnemy(Enemy ai){
+        gameAI.remove(ai);
+    }
+
+    public ArrayList<Enemy> getGameAI() {
+        return gameAI;
     }
 
     public HashMap<String, Integer> getAvailableItems() {

@@ -76,12 +76,16 @@ public class Main extends Application {
             switch (keyEvent.getCode()) {
                 case SPACE:
                     map.getPlayer().getEnemies().forEach(enemy -> {
-                        if(map.getPlayer().getHealth() > 0)
+                        if(map.getPlayer().getHealth() > 0) {
                             gameRunning = map.getPlayer().startFight(enemy);
+                            if(gameRunning) map.removeEnemy(enemy);
+                        }
+
                     });
                     refresh();
                     break;
                 case UP:
+                    map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     if(map.getPlayer().getCell().getNeighbor(0, -1).getActor() != null) {
                         String item = map.getPlayer().getCell().getNeighbor(0, -1).getActor().getTileName();
                         if (checkForKey(item)) break;
@@ -90,6 +94,7 @@ public class Main extends Application {
                     refresh();
                     break;
                 case DOWN:
+                    map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     if(map.getPlayer().getCell().getNeighbor(0, 1).getActor()!=null) {
                         String item = map.getPlayer().getCell().getNeighbor(0, 1).getActor().getTileName();
                         if (checkForKey(item)) break;
@@ -98,6 +103,7 @@ public class Main extends Application {
                     refresh();
                     break;
                 case LEFT:
+                    map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     if(map.getPlayer().getCell().getNeighbor(-1, 0).getActor()!=null) {
                         String item = map.getPlayer().getCell().getNeighbor(-1, 0).getActor().getTileName();
                         if(checkForKey(item)) break;
@@ -106,6 +112,7 @@ public class Main extends Application {
                     refresh();
                     break;
                 case RIGHT:
+                    map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     if(map.getPlayer().getCell().getNeighbor(1, 0).getActor() != null){
                         String item = map.getPlayer().getCell().getNeighbor(1, 0).getActor().getTileName();
                         if (checkForKey(item)) break;

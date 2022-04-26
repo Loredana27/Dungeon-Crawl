@@ -12,7 +12,7 @@ public abstract class Actor implements Drawable{
 
     protected int attack;
 
-    private ArrayList<Actor> enemies;
+    private ArrayList<Enemy> enemies;
 
     private HashMap<String,Integer> items;
 
@@ -26,25 +26,33 @@ public abstract class Actor implements Drawable{
     public void move(int dx, int dy) {
         Cell nextCell = cell.getNeighbor(dx, dy);
         if(!nextCell.getTileName().equalsIgnoreCase("WALL")){
-
             if(nextCell.getActor()!= null) {
                 String tileActor = nextCell.getActor().getTileName();
                 switch (tileActor){
                     case "sword":
-                        setAttack(attack + 3);
+                        if(this instanceof Player)
+                            setAttack(attack + 3);
                     case "key":
-                        this.addItem(nextCell.getActor().getTileName());
-                        cell.setActor(null);
-                        nextCell.setActor(this);
-                        cell = nextCell;
+                        if(this instanceof Player){
+                            this.addItem(nextCell.getActor().getTileName());
+                            cell.setActor(null);
+                            nextCell.setActor(this);
+                            cell = nextCell;
+                        }
                         break;
                     case "skeleton":
-                        this.isAttacked(nextCell.getActor().getAttack());
+                        if(this instanceof Player)
+                            this.isAttacked(nextCell.getActor().getAttack());
+                        break;
+                    case "player":
+                        nextCell.getActor().isAttacked(this.attack);
                         break;
                     case "door":
-                        cell.setActor(null);
-                        nextCell.setActor(this);
-                        cell = nextCell;
+                        if(this instanceof Player){
+                            cell.setActor(null);
+                            nextCell.setActor(this);
+                            cell = nextCell;
+                        }
                         break;
                 }
             }
@@ -68,7 +76,7 @@ public abstract class Actor implements Drawable{
                         if (enemy != null)
                             switch (enemy.getTileName()) {
                                 case "skeleton":
-                                    enemies.add(enemy);
+                                    enemies.add((Enemy) enemy);
                             }
                     }catch (IndexOutOfBoundsException e){
 
@@ -141,7 +149,7 @@ public abstract class Actor implements Drawable{
         this.items = items;
     }
 
-    public ArrayList<Actor> getEnemies() {
+    public ArrayList<Enemy> getEnemies() {
         return enemies;
     }
 }

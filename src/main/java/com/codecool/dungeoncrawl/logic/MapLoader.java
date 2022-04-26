@@ -33,7 +33,8 @@ public class MapLoader {
                             break;
                         case 's':
                             cell.setType(CellType.FLOOR);
-                            new Skeleton(cell);
+                            Skeleton skeleton = new Skeleton(cell);
+                            map.addAI(skeleton);
                             break;
                         case '@':
                             cell.setType(CellType.FLOOR);
