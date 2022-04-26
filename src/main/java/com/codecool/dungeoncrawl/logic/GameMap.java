@@ -4,13 +4,14 @@ import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GameMap {
     private int width;
     private int height;
     private Cell[][] cells;
 
-    private ArrayList<Actor> availableItems;
+    private HashMap<String,Integer> availableItems;
 
     private Player player;
 
@@ -18,7 +19,7 @@ public class GameMap {
         this.width = width;
         this.height = height;
         cells = new Cell[width][height];
-        this.availableItems = new ArrayList<>();
+        this.availableItems = new HashMap<>();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 cells[x][y] = new Cell(this, x, y, defaultCellType);
@@ -46,15 +47,18 @@ public class GameMap {
         return height;
     }
 
-    public void addItem(Actor item){
-        availableItems.add(item);
+    public void addItem(String item){
+        if(availableItems.containsKey(item))
+            availableItems.put(item,availableItems.get(item)+1);
+        else availableItems.put(item,1);
     }
 
-    public ArrayList<Actor> getAvailableItems() {
+    public HashMap<String, Integer> getAvailableItems() {
         return availableItems;
     }
 
-    public void removeItem(Actor item) {
-        availableItems.remove(item);
+    public void removeItem(String item) {
+        availableItems.put(item,availableItems.get(item)-1);
+        if(availableItems.get(item) == 0) availableItems.remove(item);
     }
 }

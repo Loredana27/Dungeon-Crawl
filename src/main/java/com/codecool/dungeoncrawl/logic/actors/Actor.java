@@ -1,10 +1,9 @@
 package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
-import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.Drawable;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class Actor implements Drawable{
     private Cell cell;
@@ -12,12 +11,14 @@ public abstract class Actor implements Drawable{
 
     protected int attack;
 
-    private ArrayList<Actor> items;
+//    private ArrayList<Actor> items;
+
+    private HashMap<String,Integer> items;
 
     public Actor(Cell cell) {
         this.cell = cell;
         this.cell.setActor(this);
-        items = new ArrayList<>();
+        items = new HashMap<>();
     }
 
     public void move(int dx, int dy) {
@@ -28,7 +29,7 @@ public abstract class Actor implements Drawable{
                 String tileActor = nextCell.getActor().getTileName();
                 switch (tileActor){
                     case "sword":
-                        this.addItem(nextCell.getActor());
+                        this.addItem(nextCell.getActor().getTileName());
                         cell.setActor(null);
                         nextCell.setActor(this);
                         setAttack(attack + 3);
@@ -47,6 +48,10 @@ public abstract class Actor implements Drawable{
                             cell.setActor(null);
                             nextCell.setActor(this);
                         }
+                        break;
+                    case "door":
+                        cell.setActor(null);
+                        nextCell.setActor(this);
                         break;
                 }
             }
@@ -86,11 +91,22 @@ public abstract class Actor implements Drawable{
         this.attack = attack;
     }
 
-    public void addItem(Actor item){
-        items.add(item);
+    public void addItem(String item){
+        if(items.containsKey(item))
+            items.put(item,items.get(item)+1);
+        else
+            items.put(item,1);
     }
 
-    public ArrayList<Actor> getItems() {
+    public HashMap<String, Integer> getItems() {
         return items;
+    }
+
+    public void setHealth(int health){
+        this.health = health;
+    }
+
+    public void setItems(HashMap<String, Integer> items) {
+        this.items = items;
     }
 }

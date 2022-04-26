@@ -3,6 +3,7 @@ package com.codecool.dungeoncrawl;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
+import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Sword;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -28,9 +29,12 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 public class Main extends Application {
     Stage mainStage;
@@ -86,24 +90,67 @@ public class Main extends Application {
         if (gameRunning) {
             switch (keyEvent.getCode()) {
                 case UP:
+                    if(map.getPlayer().getCell().getNeighbor(0, -1).getActor() != null)
+                        if(map.getPlayer().getCell().getNeighbor(0, -1).getActor().getTileName().equals("door")) {
+                            nextLevel();
+                            break;
+                        } else if (map.getPlayer().getCell().getNeighbor(0, -1).getActor().getTileName().equals("sword")) {
+                            if(map.getAvailableItems().containsKey("sword")) map.removeItem("sword");
+                        }
                     map.getPlayer().move(0, -1);
                     refresh();
                     break;
                 case DOWN:
+                    System.out.println(map.getPlayer().getCell().getNeighbor(0, 1).getActor());
+                    if(map.getPlayer().getCell().getNeighbor(0, 1).getActor()!=null)
+                        if (map.getPlayer().getCell().getNeighbor(0, 1).getActor().getTileName().equals("door")) {
+                            nextLevel();
+                            break;
+                        }else if (map.getPlayer().getCell().getNeighbor(0, 1).getActor().getTileName().equals("sword")) {
+                            if(map.getAvailableItems().containsKey("sword")) map.removeItem("sword");
+                        }
                     map.getPlayer().move(0, 1);
                     refresh();
                     break;
                 case LEFT:
+                    if(map.getPlayer().getCell().getNeighbor(-1, 0).getActor()!=null)
+                        if (map.getPlayer().getCell().getNeighbor(-1, 0).getActor().getTileName().equals("door")) {
+                            nextLevel();
+                            break;
+                        }else if (map.getPlayer().getCell().getNeighbor(-1,0).getActor().getTileName().equals("sword")) {
+                            if(map.getAvailableItems().containsKey("sword")) map.removeItem("sword");
+                        }
                     map.getPlayer().move(-1, 0);
                     refresh();
                     break;
                 case RIGHT:
+                    if(map.getPlayer().getCell().getNeighbor(1, 0).getActor() != null){
+                        if (map.getPlayer().getCell().getNeighbor(1, 0).getActor().getTileName().equals("door")) {
+                            nextLevel();
+                            break;
+                        }else if (map.getPlayer().getCell().getNeighbor(1, 0).getActor().getTileName().equals("sword")) {
+                            if(map.getAvailableItems().containsKey("sword")) map.removeItem("sword");
+                        }
+                    }
                     map.getPlayer().move(1, 0);
                     refresh();
                     break;
             }
+//            System.out.printf("X: %s   Y:%s\n",map.getPlayer().getX(),map.getPlayer().getY());
             checkForEnd();
         }
+    }
+
+    private void nextLevel() {
+        int playerAD = map.getPlayer().getAttack();
+        int playerHP = map.getPlayer().getHealth();
+        HashMap<String,Integer> items = map.getPlayer().getItems();
+        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map.txt"));
+        map.getPlayer().setAttack(playerAD);
+        map.getPlayer().setHealth(playerHP);
+
+        map.getPlayer().setItems(items);
+        refresh();
     }
 
     private void initUI(){
@@ -168,10 +215,10 @@ public class Main extends Application {
         Label label = new Label("Inventory:");
         inventory.add(label,0,0);
         GridPane.setConstraints(label,0,0,2,1);
-        map.getPlayer().getItems().forEach(item -> {
-            if(map.getAvailableItems().contains(item)) map.removeItem(item);
+        HashMap<String,Integer> items = map.getPlayer().getItems();
+        items.keySet().forEach(item -> {
             inventory.add(new Label("•"),0,row.get());
-            inventory.add(new Label(item.getTileName()),1,row.get());
+            inventory.add(new Label(String.format("%s: %s",item,items.get(item))),1,row.get());
             row.getAndIncrement();
         });
     }
@@ -182,9 +229,10 @@ public class Main extends Application {
         Label label = new Label("Available items: ");
         itemsToCollect.add(label,0,0);
         GridPane.setConstraints(label,0,0,2,1);
-        map.getAvailableItems().forEach(item -> {
+        HashMap<String,Integer> items = map.getAvailableItems();
+        items.keySet().forEach(item -> {
             itemsToCollect.add(new Label("•"),0,row.get());
-            itemsToCollect.add(new Label(item.getTileName()),1,row.get());
+            itemsToCollect.add(new Label(String.format("%s: %s",item,items.get(item))),1,row.get());
             row.getAndIncrement();
         });
     }
