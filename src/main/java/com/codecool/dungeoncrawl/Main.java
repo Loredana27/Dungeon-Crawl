@@ -63,7 +63,6 @@ public class Main extends Application {
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
-        System.out.println(keyEvent.getCode());
         if (gameRunning) {
             switch (keyEvent.getCode()) {
                 case UP:
