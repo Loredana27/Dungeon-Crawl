@@ -8,8 +8,8 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 public class MapLoader {
-    public static GameMap loadMap() {
-        InputStream is = MapLoader.class.getResourceAsStream("/map.txt");
+    public static GameMap loadMap(InputStream mapFile) {
+        InputStream is = mapFile;
         assert is != null;
         Scanner scanner = new Scanner(is);
         int width = scanner.nextInt();
@@ -43,7 +43,8 @@ public class MapLoader {
                             break;
                         case '1':
                             cell.setType(CellType.FLOOR);
-                            new Sword(cell);
+                            Sword sword = new Sword(cell);
+                            map.addItem(sword);
                             break;
                         default:
                             throw new RuntimeException("Unrecognized character: '" + line.charAt(x) + "'");

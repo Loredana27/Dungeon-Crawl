@@ -4,15 +4,20 @@ import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.Drawable;
 
-public abstract class Actor implements Drawable {
+import java.util.ArrayList;
+
+public abstract class Actor implements Drawable{
     private Cell cell;
     protected int health = 10;
 
     protected int attack;
 
+    private ArrayList<Actor> items;
+
     public Actor(Cell cell) {
         this.cell = cell;
         this.cell.setActor(this);
+        items = new ArrayList<>();
     }
 
     public void move(int dx, int dy) {
@@ -20,32 +25,35 @@ public abstract class Actor implements Drawable {
         if(!nextCell.getTileName().equalsIgnoreCase("WALL")){
 
             if(nextCell.getActor()!= null) {
-                System.out.println(nextCell.getActor().getTileName());
-                if (nextCell.getActor().getTileName().equals("sword")) {
-                    cell.setActor(null);
-                    nextCell.setActor(this);
-                    setAttack(attack + 3);
-                } else if (nextCell.getActor().getTileName().equals("skeleton")) {
-                    while(true){
-                        nextCell.getActor().isAttacked(this.attack);
-                        if(nextCell.getActor().getHealth() <= 0) break;
-                        this.isAttacked(nextCell.getActor().getAttack());
-                        if(this.health <= 0) break;
-                    }
-                    if(this.health <= 0){
-                        cell.setActor(null);
-                    }
-                    else{
+                String tileActor = nextCell.getActor().getTileName();
+                switch (tileActor){
+                    case "sword":
+                        this.addItem(nextCell.getActor());
                         cell.setActor(null);
                         nextCell.setActor(this);
-                    }
+                        setAttack(attack + 3);
+                        break;
+                    case "skeleton":
+                        while(true){
+                            nextCell.getActor().isAttacked(this.attack);
+                            if(nextCell.getActor().getHealth() <= 0) break;
+                            this.isAttacked(nextCell.getActor().getAttack());
+                            if(this.health <= 0) break;
+                        }
+                        if(this.health <= 0){
+                            cell.setActor(null);
+                        }
+                        else{
+                            cell.setActor(null);
+                            nextCell.setActor(this);
+                        }
+                        break;
                 }
             }
             else{
                 cell.setActor(null);
                 nextCell.setActor(this);
             }
-
             cell = nextCell;
         }
     }
@@ -76,5 +84,13 @@ public abstract class Actor implements Drawable {
 
     public void setAttack(int attack) {
         this.attack = attack;
+    }
+
+    public void addItem(Actor item){
+        items.add(item);
+    }
+
+    public ArrayList<Actor> getItems() {
+        return items;
     }
 }

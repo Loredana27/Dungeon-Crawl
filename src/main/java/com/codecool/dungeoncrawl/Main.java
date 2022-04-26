@@ -3,6 +3,7 @@ package com.codecool.dungeoncrawl;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
+import com.codecool.dungeoncrawl.logic.actors.Sword;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -29,14 +30,20 @@ import javafx.stage.StageStyle;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
     Stage mainStage;
     Scene scene;
+
+    BorderPane uiContainer;
+    GridPane uiDetails;
+
+    GridPane ui;
     GridPane inventory;
     GridPane itemsToCollect;
     Button exitButton;
-    GameMap map = MapLoader.loadMap();
+    GameMap map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map.txt"));
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
             map.getHeight() * Tiles.TILE_WIDTH);
@@ -54,6 +61,19 @@ public class Main extends Application {
         mainStage = primaryStage;
 
         initUI();
+
+        BorderPane borderPane = new BorderPane();
+
+        borderPane.setCenter(canvas);
+        borderPane.setRight(uiContainer);
+
+        scene = new Scene(borderPane);
+        mainStage.setScene(scene);
+
+        canvas.setFocusTraversable(true);
+        uiContainer.setFocusTraversable(true);
+        scene.addEventHandler(KeyEvent.KEY_PRESSED,this::onKeyPressed);
+        refresh();
 
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png")));
         primaryStage.getIcons().add(icon);
@@ -87,23 +107,35 @@ public class Main extends Application {
     }
 
     private void initUI(){
-        BorderPane uiContainer = new BorderPane();
+        uiContainer = new BorderPane();
         uiContainer.getStyleClass().add("mainPain");
         uiContainer.getStylesheets().add(getClass().getResource("/style/ui.css").toExternalForm());
 
-        GridPane ui = new GridPane();
-        ui.getStyleClass().add("GridPane");
-        ui.setPrefWidth(200);
-        ui.setPadding(new Insets(10));
+        uiDetails = new GridPane();
+        uiDetails.getStyleClass().add("GridPane");
+        uiDetails.setPrefWidth(200);
+        uiDetails.setPadding(new Insets(10));
 
-        ui.add(new Label("Health: "), 0, 0);
-        ui.add(healthLabel, 1, 0);
+        uiDetails.add(new Label("Health: "), 0, 0);
+        uiDetails.add(healthLabel, 1, 0);
         Label attackLabelText = new Label("Attack damage: ");
-        ui.add(attackLabelText,0,1);
+        uiDetails.add(attackLabelText,0,1);
         GridPane.setConstraints(attackLabelText,0,1,2,1);
-        ui.add(attackLabel,2,1);
+        uiDetails.add(attackLabel,2,1);
+
+        inventory = new GridPane();
+        inventory.getStyleClass().add("inventory");
+        inventory.getChildren().add(new Label("Inventory:"));
 
 
+        itemsToCollect = new GridPane();
+        itemsToCollect.getStyleClass().add("itemsToCollect");
+        itemsToCollect.getChildren().add(new Label("Available Itemes:"));
+
+//        uiDetails.add(inventory,0,3);
+//        GridPane.setConstraints(inventory,0,3,3,1);
+//        GridPane.setConstraints(itemsToCollect,0,4,3,1);
+//        ui.add(itemsToCollect,0,4);
 
         GridPane exitContainer = new GridPane();
         exitContainer.getStyleClass().add("ExitContainer");
@@ -113,22 +145,48 @@ public class Main extends Application {
 
         exitContainer.add(exitButton, 1,0);
 
-        uiContainer.setCenter(ui);
+        uiContainer.setTop(uiDetails);
         uiContainer.setBottom(exitContainer);
 
+    }
 
-        BorderPane borderPane = new BorderPane();
+    private void refreshUI(){
+        refreshInventory();
+        refreshItems();
+        ui = new GridPane();
+        ui.getStyleClass().add("items");
+        inventory.getStyleClass().add("inventory");
+        itemsToCollect.getStyleClass().add("itemsToCollect");
+        ui.add(inventory,0,0);
+        ui.add(itemsToCollect,0,1);
+        uiContainer.setCenter(ui);
+    }
 
-        borderPane.setCenter(canvas);
-        borderPane.setRight(uiContainer);
+    private void refreshInventory(){
+        inventory = new GridPane();
+        AtomicInteger row = new AtomicInteger(1);
+        Label label = new Label("Inventory:");
+        inventory.add(label,0,0);
+        GridPane.setConstraints(label,0,0,2,1);
+        map.getPlayer().getItems().forEach(item -> {
+            if(map.getAvailableItems().contains(item)) map.removeItem(item);
+            inventory.add(new Label("•"),0,row.get());
+            inventory.add(new Label(item.getTileName()),1,row.get());
+            row.getAndIncrement();
+        });
+    }
 
-        scene = new Scene(borderPane);
-        mainStage.setScene(scene);
-
-        canvas.setFocusTraversable(true);
-        uiContainer.setFocusTraversable(true);
-        scene.addEventHandler(KeyEvent.KEY_PRESSED,this::onKeyPressed);
-        refresh();
+    private void refreshItems(){
+        itemsToCollect = new GridPane();
+        AtomicInteger row = new AtomicInteger(1);
+        Label label = new Label("Available items: ");
+        itemsToCollect.add(label,0,0);
+        GridPane.setConstraints(label,0,0,2,1);
+        map.getAvailableItems().forEach(item -> {
+            itemsToCollect.add(new Label("•"),0,row.get());
+            itemsToCollect.add(new Label(item.getTileName()),1,row.get());
+            row.getAndIncrement();
+        });
     }
 
 
@@ -158,6 +216,7 @@ public class Main extends Application {
         }
         healthLabel.setText("" + map.getPlayer().getHealth());
         attackLabel.setText("" + map.getPlayer().getAttack());
+        refreshUI();
     }
 
     public void showGameOver(){
@@ -174,7 +233,6 @@ public class Main extends Application {
         alert.getButtonTypes().add(0,buttonYes);
         alert.getButtonTypes().add(1,buttonNo);
 
-        System.out.println();
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStylesheets().add(getClass().getResource("/style/gameOver.css").toExternalForm());
         dialogPane.getStyleClass().add("gameOverPane");
@@ -192,7 +250,7 @@ public class Main extends Application {
 
 
     private void restartGame(){
-        map = MapLoader.loadMap();
+        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map.txt"));
         gameRunning = true;
         refresh();
     }
