@@ -78,6 +78,7 @@ public abstract class Actor implements Drawable{
                         if (enemy != null)
                             switch (enemy.getTileName()) {
                                 case "skeleton":
+                                case "bat":
                                     enemies.add((Enemy) enemy);
                             }
                     }catch (IndexOutOfBoundsException e){
