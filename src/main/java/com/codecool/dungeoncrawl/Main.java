@@ -3,38 +3,23 @@ package com.codecool.dungeoncrawl;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
-import com.codecool.dungeoncrawl.logic.actors.Actor;
-import com.codecool.dungeoncrawl.logic.actors.Sword;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 
 public class Main extends Application {
     Stage mainStage;
@@ -90,47 +75,33 @@ public class Main extends Application {
         if (gameRunning) {
             switch (keyEvent.getCode()) {
                 case UP:
-                    if(map.getPlayer().getCell().getNeighbor(0, -1).getActor() != null)
-                        if(map.getPlayer().getCell().getNeighbor(0, -1).getActor().getTileName().equals("door")) {
-                            nextLevel();
-                            break;
-                        } else if (map.getPlayer().getCell().getNeighbor(0, -1).getActor().getTileName().equals("sword")) {
-                            if(map.getAvailableItems().containsKey("sword")) map.removeItem("sword");
-                        }
+                    if(map.getPlayer().getCell().getNeighbor(0, -1).getActor() != null) {
+                        String item = map.getPlayer().getCell().getNeighbor(0, -1).getActor().getTileName();
+                        if (checkForKey(item)) break;
+                    }
                     map.getPlayer().move(0, -1);
                     refresh();
                     break;
                 case DOWN:
-                    System.out.println(map.getPlayer().getCell().getNeighbor(0, 1).getActor());
-                    if(map.getPlayer().getCell().getNeighbor(0, 1).getActor()!=null)
-                        if (map.getPlayer().getCell().getNeighbor(0, 1).getActor().getTileName().equals("door")) {
-                            nextLevel();
-                            break;
-                        }else if (map.getPlayer().getCell().getNeighbor(0, 1).getActor().getTileName().equals("sword")) {
-                            if(map.getAvailableItems().containsKey("sword")) map.removeItem("sword");
-                        }
+                    if(map.getPlayer().getCell().getNeighbor(0, 1).getActor()!=null) {
+                        String item = map.getPlayer().getCell().getNeighbor(0, 1).getActor().getTileName();
+                        if (checkForKey(item)) break;
+                    }
                     map.getPlayer().move(0, 1);
                     refresh();
                     break;
                 case LEFT:
-                    if(map.getPlayer().getCell().getNeighbor(-1, 0).getActor()!=null)
-                        if (map.getPlayer().getCell().getNeighbor(-1, 0).getActor().getTileName().equals("door")) {
-                            nextLevel();
-                            break;
-                        }else if (map.getPlayer().getCell().getNeighbor(-1,0).getActor().getTileName().equals("sword")) {
-                            if(map.getAvailableItems().containsKey("sword")) map.removeItem("sword");
-                        }
+                    if(map.getPlayer().getCell().getNeighbor(-1, 0).getActor()!=null) {
+                        String item = map.getPlayer().getCell().getNeighbor(-1, 0).getActor().getTileName();
+                        if(checkForKey(item)) break;
+                    }
                     map.getPlayer().move(-1, 0);
                     refresh();
                     break;
                 case RIGHT:
                     if(map.getPlayer().getCell().getNeighbor(1, 0).getActor() != null){
-                        if (map.getPlayer().getCell().getNeighbor(1, 0).getActor().getTileName().equals("door")) {
-                            nextLevel();
-                            break;
-                        }else if (map.getPlayer().getCell().getNeighbor(1, 0).getActor().getTileName().equals("sword")) {
-                            if(map.getAvailableItems().containsKey("sword")) map.removeItem("sword");
-                        }
+                        String item = map.getPlayer().getCell().getNeighbor(1, 0).getActor().getTileName();
+                        if (checkForKey(item)) break;
                     }
                     map.getPlayer().move(1, 0);
                     refresh();
@@ -139,6 +110,18 @@ public class Main extends Application {
 //            System.out.printf("X: %s   Y:%s\n",map.getPlayer().getX(),map.getPlayer().getY());
             checkForEnd();
         }
+    }
+
+    private boolean checkForKey(String item) {
+        if (item.equals("door")) {
+            if(map.getPlayer().getItems().containsKey("key")) {
+                nextLevel();
+            }
+            return true;
+        } else if (item.equals("sword") || item.equals("key")) {
+            if (map.getAvailableItems().containsKey(item)) map.removeItem(item);
+        }
+        return false;
     }
 
     private void nextLevel() {

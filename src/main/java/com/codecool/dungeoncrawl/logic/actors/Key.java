@@ -2,19 +2,14 @@ package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
 
-import java.util.ArrayList;
+public class Key extends Actor{
 
-
-public class Player extends Actor {
-
-    public Player(Cell cell) {
+    public Key(Cell cell) {
         super(cell);
-        attack = 5;
     }
 
+    @Override
     public String getTileName() {
-        return "player";
+        return "key";
     }
-
-
 }

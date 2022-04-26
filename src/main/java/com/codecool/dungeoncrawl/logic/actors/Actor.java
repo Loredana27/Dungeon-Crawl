@@ -29,10 +29,11 @@ public abstract class Actor implements Drawable{
                 String tileActor = nextCell.getActor().getTileName();
                 switch (tileActor){
                     case "sword":
+                        setAttack(attack + 3);
+                    case "key":
                         this.addItem(nextCell.getActor().getTileName());
                         cell.setActor(null);
                         nextCell.setActor(this);
-                        setAttack(attack + 3);
                         break;
                     case "skeleton":
                         while(true){
@@ -53,6 +54,7 @@ public abstract class Actor implements Drawable{
                         cell.setActor(null);
                         nextCell.setActor(this);
                         break;
+
                 }
             }
             else{

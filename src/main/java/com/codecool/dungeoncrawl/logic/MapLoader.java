@@ -1,9 +1,6 @@
 package com.codecool.dungeoncrawl.logic;
 
-import com.codecool.dungeoncrawl.logic.actors.Door;
-import com.codecool.dungeoncrawl.logic.actors.Player;
-import com.codecool.dungeoncrawl.logic.actors.Skeleton;
-import com.codecool.dungeoncrawl.logic.actors.Sword;
+import com.codecool.dungeoncrawl.logic.actors.*;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -50,6 +47,11 @@ public class MapLoader {
                         case 'd':
                             cell.setType(CellType.FLOOR);
                             new Door(cell);
+                            break;
+                        case 'k':
+                            cell.setType(CellType.FLOOR);
+                            Key key = new Key(cell);
+                            map.addItem(key.getTileName());
                             break;
                         default:
                             throw new RuntimeException("Unrecognized character: '" + line.charAt(x) + "'");
