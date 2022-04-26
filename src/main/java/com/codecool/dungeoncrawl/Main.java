@@ -3,6 +3,7 @@ package com.codecool.dungeoncrawl;
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
+import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -127,12 +128,17 @@ public class Main extends Application {
     }
 
     private boolean checkForKey(String item) {
-        if (item.equals("door")) {
+        if (item.equals("opened-door")) {
             if(map.getPlayer().getItems().containsKey("key")) {
                 nextLevel();
             }
             return true;
         } else if (item.equals("sword") || item.equals("key")) {
+            if(item.equals("key")) {
+                Cell cell = map.getDoor().getCell();
+                map.setDoor(new OpenedDoor(cell));
+                cell.setActor(map.getDoor());
+            }
             if (map.getAvailableItems().containsKey(item)) map.removeItem(item);
         }
         return false;

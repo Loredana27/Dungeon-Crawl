@@ -1,6 +1,7 @@
 package com.codecool.dungeoncrawl.logic;
 
 import com.codecool.dungeoncrawl.logic.actors.Actor;
+import com.codecool.dungeoncrawl.logic.actors.Door;
 import com.codecool.dungeoncrawl.logic.actors.Enemy;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 
@@ -17,6 +18,8 @@ public class GameMap {
     private ArrayList<Enemy> gameAI;
 
     private Player player;
+
+    private Door door;
 
     public GameMap(int width, int height, CellType defaultCellType) {
         this.width = width;
@@ -67,6 +70,14 @@ public class GameMap {
 
     public ArrayList<Enemy> getGameAI() {
         return gameAI;
+    }
+
+    public Door getDoor() {
+        return door;
+    }
+
+    public void setDoor(Door door) {
+        this.door = door;
     }
 
     public HashMap<String, Integer> getAvailableItems() {

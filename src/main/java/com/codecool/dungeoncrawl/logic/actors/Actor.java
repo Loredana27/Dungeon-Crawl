@@ -12,6 +12,8 @@ public abstract class Actor implements Drawable{
 
     protected int attack;
 
+
+
     private ArrayList<Enemy> enemies;
 
     private HashMap<String,Integer> items;
@@ -25,7 +27,7 @@ public abstract class Actor implements Drawable{
 
     public void move(int dx, int dy) {
         Cell nextCell = cell.getNeighbor(dx, dy);
-        if(!nextCell.getTileName().equalsIgnoreCase("WALL")){
+        if(!(nextCell.getTileName().equalsIgnoreCase("WALL") || nextCell.getTileName().equalsIgnoreCase("door"))){
             if(nextCell.getActor()!= null) {
                 String tileActor = nextCell.getActor().getTileName();
                 switch (tileActor){
@@ -47,7 +49,7 @@ public abstract class Actor implements Drawable{
                     case "player":
                         nextCell.getActor().isAttacked(this.attack);
                         break;
-                    case "door":
+                    case "opened-door":
                         if(this instanceof Player){
                             cell.setActor(null);
                             nextCell.setActor(this);
