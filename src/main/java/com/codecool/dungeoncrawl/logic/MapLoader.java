@@ -36,6 +36,11 @@ public class MapLoader {
                             Skeleton skeleton = new Skeleton(cell);
                             map.addAI(skeleton);
                             break;
+                        case 'b':
+                            cell.setType(CellType.FLOOR);
+                            Bat bat = new Bat(cell);
+                            map.addAI(bat);
+                            break;
                         case '@':
                             cell.setType(CellType.FLOOR);
                             map.setPlayer(new Player(cell));
