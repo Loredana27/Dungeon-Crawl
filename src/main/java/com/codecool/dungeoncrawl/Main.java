@@ -130,6 +130,7 @@ public class Main extends Application {
     private boolean checkForKey(String item) {
         if (item.equals("opened-door")) {
             if(map.getPlayer().getItems().containsKey("key")) {
+                map.getPlayer().getItems().remove("key");
                 nextLevel();
             }
             return true;

@@ -9,7 +9,7 @@ public class Skeleton extends Enemy {
     public Skeleton(Cell cell) {
         super(cell);
         attack = 2;
-        health = 12;
+        health = 8;
     }
 
     @Override
