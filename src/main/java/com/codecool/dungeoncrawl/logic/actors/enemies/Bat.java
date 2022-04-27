@@ -1,10 +1,11 @@
-package com.codecool.dungeoncrawl.logic.actors;
+package com.codecool.dungeoncrawl.logic.actors.enemies;
 
 import com.codecool.dungeoncrawl.logic.Cell;
+import com.codecool.dungeoncrawl.logic.actors.Player;
 
 import java.util.Random;
 
-public class Bat extends Enemy{
+public class Bat extends Enemy {
 
 
     public Bat(Cell cell) {

@@ -1,10 +1,11 @@
-package com.codecool.dungeoncrawl.logic.actors;
+package com.codecool.dungeoncrawl.logic.actors.enemies;
 
 import com.codecool.dungeoncrawl.logic.Cell;
+import com.codecool.dungeoncrawl.logic.actors.Player;
 
 import java.util.Random;
 
-public class Skeleton extends Enemy{
+public class Skeleton extends Enemy {
     public Skeleton(Cell cell) {
         super(cell);
         attack = 2;
