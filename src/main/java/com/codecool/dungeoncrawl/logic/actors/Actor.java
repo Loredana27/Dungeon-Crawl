@@ -2,6 +2,7 @@ package com.codecool.dungeoncrawl.logic.actors;
 
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.Drawable;
+import com.codecool.dungeoncrawl.logic.actors.enemies.Enemy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,8 +82,7 @@ public abstract class Actor implements Drawable{
                                 case "bat":
                                     enemies.add((Enemy) enemy);
                             }
-                    }catch (IndexOutOfBoundsException e){
-
+                    }catch (IndexOutOfBoundsException ignored){
                     }
                 }
             }

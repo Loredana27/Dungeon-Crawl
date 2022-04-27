@@ -33,7 +33,7 @@ public class Main extends Application {
     GridPane inventory;
     GridPane itemsToCollect;
     Button exitButton;
-    GameMap map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map.txt"));
+    GameMap map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map2.txt"));
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
             map.getHeight() * Tiles.TILE_WIDTH);
@@ -148,7 +148,7 @@ public class Main extends Application {
         int playerAD = map.getPlayer().getAttack();
         int playerHP = map.getPlayer().getHealth();
         HashMap<String,Integer> items = map.getPlayer().getItems();
-        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map.txt"));
+        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map2.txt"));
         map.getPlayer().setAttack(playerAD);
         map.getPlayer().setHealth(playerHP);
 

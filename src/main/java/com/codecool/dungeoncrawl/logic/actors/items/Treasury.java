@@ -1,15 +1,16 @@
-package com.codecool.dungeoncrawl.logic.actors;
+package com.codecool.dungeoncrawl.logic.actors.items;
 
 import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.actors.Actor;
 
-public class Door extends Actor {
-    public Door(Cell cell) {
+public class Treasury extends Actor {
+
+    public Treasury(Cell cell) {
         super(cell);
     }
 
     @Override
     public String getTileName() {
-        return "door";
+        return "treasury";
     }
 }

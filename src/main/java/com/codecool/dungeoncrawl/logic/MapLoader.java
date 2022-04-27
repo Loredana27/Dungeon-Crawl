@@ -1,6 +1,8 @@
 package com.codecool.dungeoncrawl.logic;
 
 import com.codecool.dungeoncrawl.logic.actors.*;
+import com.codecool.dungeoncrawl.logic.actors.enemies.*;
+import com.codecool.dungeoncrawl.logic.actors.items.*;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -30,6 +32,45 @@ public class MapLoader {
                             break;
                         case '.':
                             cell.setType(CellType.FLOOR);
+                            break;
+                        case '+':
+                            cell.setType(CellType.TREE);
+                            break;
+                        case '*':
+                            cell.setType(CellType.TREE);
+                            Bear bear = new Bear(cell);
+                            map.addAI(bear);
+                            break;
+                        case '$':
+                            cell.setType(CellType.TREE);
+                            HealPotion healPotion = new HealPotion(cell);
+                            map.addItem(healPotion.getTileName());
+                            break;
+                        case 'h':
+                            cell.setType(CellType.HOUSE);
+                            break;
+                        case 'f':
+                            cell.setType(CellType.GRASS);
+                            Farmer farmer = new Farmer(cell);
+                            map.addAI(farmer);
+                            break;
+                        case '-':
+                            cell.setType(CellType.GRASS);
+                            break;
+                        case '!':
+                            cell.setType(CellType.FLOOR);
+                            Soldier soldier = new Soldier(cell);
+                            map.addAI(soldier);
+                            break;
+                        case 'a':
+                            cell.setType(CellType.FLOOR);
+                            Treasury treasury = new Treasury(cell);
+                            map.addItem(treasury.getTileName());
+                            break;
+                        case 'A':
+                            cell.setType(CellType.FLOOR);
+                            TreasuryKey treasuryKey = new TreasuryKey(cell);
+                            map.addItem(treasuryKey.getTileName());
                             break;
                         case 's':
                             cell.setType(CellType.FLOOR);

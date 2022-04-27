@@ -4,6 +4,9 @@ public enum CellType {
     SWORD("sword"),
     EMPTY("empty"),
     FLOOR("floor"),
+    TREE("tree"),
+    HOUSE("house"),
+    GRASS("grass"),
     WALL("wall");
 
 
