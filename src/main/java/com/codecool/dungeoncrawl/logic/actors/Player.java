@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 public class Player extends Actor {
 
+    private String name;
+
     public Player(Cell cell) {
         super(cell);
         attack = 5;
@@ -17,5 +19,11 @@ public class Player extends Actor {
         return "player";
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 }

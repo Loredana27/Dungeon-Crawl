@@ -41,7 +41,7 @@ public abstract class Actor implements Drawable{
                         case "heal":
                         case "opened-door":
                         case "sword":
-                        case "treasurykey":
+                        case "treasure key":
                         case "key":
                             if (this instanceof Player) {
                                 cell.setActor(null);
@@ -49,9 +49,9 @@ public abstract class Actor implements Drawable{
                                 cell = nextCell;
                             }
                             break;
-                        case "treasury":
+                        case "treasure":
                             if (this instanceof Player) {
-                                if(items.containsKey("treasurykey")) {
+                                if(items.containsKey("treasure key")) {
                                     cell.setActor(null);
                                     nextCell.setActor(this);
                                     cell = nextCell;
@@ -97,11 +97,11 @@ public abstract class Actor implements Drawable{
                     addItem("bigsword");
                     attack += 7;
                     health += 10;
-                    items.remove("treasurekey");
+                    removeItem("treasure key");
                     cell.cleanTempItem();
                     break;
-                case "treasurekey":
-                    addItem("treasurekey");
+                case "treasure key":
+                    addItem("treasure key");
                     cell.cleanTempItem();
                     break;
             }
@@ -180,6 +180,11 @@ public abstract class Actor implements Drawable{
             items.put(item,items.get(item)+1);
         else
             items.put(item,1);
+    }
+
+    public void removeItem(String item){
+        items.put(item, items.get(item) -1);
+        if (items.get(item) == 0) items.remove(item);
     }
 
     public HashMap<String, Integer> getItems() {

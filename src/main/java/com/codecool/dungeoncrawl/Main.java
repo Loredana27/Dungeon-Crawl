@@ -48,6 +48,7 @@ public class Main extends Application {
     GraphicsContext context = canvas.getGraphicsContext2D();
     Label healthLabel = new Label();
     Label attackLabel = new Label();
+    Label nameLabel = new Label();
     boolean gameRunning = true;
 
     public static void main(String[] args) {
@@ -78,6 +79,8 @@ public class Main extends Application {
         primaryStage.setTitle("Dungeon Crawl - By L.A");
         primaryStage.setResizable(false);
         primaryStage.show();
+
+        getPlayerName();
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
@@ -142,8 +145,16 @@ public class Main extends Application {
         }
     }
 
-    private boolean checkForKey() {
-        return map.getPlayer().getItems().containsKey("key");
+    private void getPlayerName(){
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.initOwner(mainStage);
+        inputDialog.setGraphic(null);
+        inputDialog.setTitle("Character name needed!");
+        inputDialog.setHeaderText("Please insert your name: ");
+        inputDialog.setContentText("");
+        inputDialog.showAndWait();
+        nameLabel.setText(inputDialog.getEditor().getText());
+        refresh();
     }
 
     private void nextLevel() {
@@ -182,12 +193,16 @@ public class Main extends Application {
         uiDetails.setPrefWidth(200);
         uiDetails.setPadding(new Insets(10));
 
-        uiDetails.add(new Label("Health: "), 0, 0);
-        uiDetails.add(healthLabel, 1, 0);
+        uiDetails.add(new Label("Name: "),0,0);
+        uiDetails.add(nameLabel,1,0);
+        GridPane.setConstraints(nameLabel,1,0,2,1);
+
+        uiDetails.add(new Label("Health: "), 0, 1);
+        uiDetails.add(healthLabel, 1, 1);
         Label attackLabelText = new Label("Attack damage: ");
-        uiDetails.add(attackLabelText,0,1);
-        GridPane.setConstraints(attackLabelText,0,1,2,1);
-        uiDetails.add(attackLabel,2,1);
+        uiDetails.add(attackLabelText,0,2);
+        GridPane.setConstraints(attackLabelText,0,2,2,1);
+        uiDetails.add(attackLabel,2,2);
 
         inventory = new GridPane();
         inventory.getStyleClass().add("inventory");
