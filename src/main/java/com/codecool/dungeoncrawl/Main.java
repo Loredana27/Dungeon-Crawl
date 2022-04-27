@@ -6,6 +6,7 @@ import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -15,8 +16,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,6 +29,11 @@ public class Main extends Application {
     Stage mainStage;
     Scene scene;
 
+    int actualMap = 1;
+    String firstMap= "/map.txt";
+    String secondMap = "/map2.txt";
+    String thirdMap= "/map3.txt";
+
     BorderPane uiContainer;
     GridPane uiDetails;
 
@@ -33,7 +41,7 @@ public class Main extends Application {
     GridPane inventory;
     GridPane itemsToCollect;
     Button exitButton;
-    GameMap map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map.txt"));
+    GameMap map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
             map.getHeight() * Tiles.TILE_WIDTH);
@@ -68,12 +76,14 @@ public class Main extends Application {
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png")));
         primaryStage.getIcons().add(icon);
         primaryStage.setTitle("Dungeon Crawl - By L.A");
-        primaryStage.setResizable(true);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
         if (gameRunning) {
+            String text;
+            int health = map.getPlayer().getHealth();
             switch (keyEvent.getCode()) {
                 case SPACE:
                     map.getPlayer().getEnemies().forEach(enemy -> {
@@ -86,9 +96,12 @@ public class Main extends Application {
                     break;
                 case E:
                     try{
+                        String item = map.getPlayer().getCell().getTempItem();
                         map.removeItem(map.getPlayer().getCell().getTempItem());
                         map.getPlayer().pickupItem();
                         refresh();
+                        text = String.format("You picked up a %s!",item);
+                        showCanvasMessage(text,140,20);
                     }catch (NullPointerException ignored){}
                     break;
                 case UP:
@@ -120,8 +133,11 @@ public class Main extends Application {
                     refresh();
                     break;
             }
+            if(health > map.getPlayer().getHealth()) {
+                text = String.format("You lost %s health points in battle!", health - map.getPlayer().getHealth());
+                showCanvasMessage(text, 190, 20);
+            }
             if(map.getPlayer().getCell().equals(map.getDoor().getCell())) nextLevel();
-//            System.out.printf("X: %s   Y:%s\n",map.getPlayer().getX(),map.getPlayer().getY());
             checkForEnd();
         }
     }
@@ -134,11 +150,25 @@ public class Main extends Application {
         int playerAD = map.getPlayer().getAttack();
         int playerHP = map.getPlayer().getHealth();
         HashMap<String,Integer> items = map.getPlayer().getItems();
-        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map2.txt"));
+        String nextMap;
+        if(actualMap == 1) {
+            nextMap = secondMap;
+            actualMap++;
+        }
+        else if(actualMap == 2) {
+            nextMap = thirdMap;
+            actualMap++;
+        }
+        else{
+            gameRunning = false;
+            return;
+        }
+        if(!nextMap.equals(""))
+            map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(nextMap));
         map.getPlayer().setAttack(playerAD);
         map.getPlayer().setHealth(playerHP);
-
         map.getPlayer().setItems(items);
+
         refresh();
     }
 
@@ -252,6 +282,7 @@ public class Main extends Application {
         healthLabel.setText("" + map.getPlayer().getHealth());
         attackLabel.setText("" + map.getPlayer().getAttack());
         refreshUI();
+//        showCanvasMessage("Hello!",50,20);
     }
 
     public void showGameOver(){
@@ -276,7 +307,8 @@ public class Main extends Application {
             try {
                 restartGame();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+//                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         } else if (result.get() == buttonNo) {
             System.exit(1);
@@ -285,8 +317,32 @@ public class Main extends Application {
 
 
     private void restartGame(){
-        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map.txt"));
+        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
+        actualMap = 1;
         gameRunning = true;
         refresh();
+    }
+
+    private void showCanvasMessage(String text ,double width, double height){
+        double x;
+        double y;
+        double playerX = map.getPlayer().getX() < 12 ? map.getPlayer().getX() : (map.getPlayer().getX() < map.getWidth() - 13 ? 12 : map.getWidth()-25+map.getPlayer().getX());
+        double initialX = playerX*32 - width/2;
+        if(initialX < 0) x = 5;
+        else if(initialX + width > 25*32) x = 25*32 - width - 30;
+        else x = initialX;
+        double initialY = map.getPlayer().getY()*32-height;
+        if(initialY < 0) y = 10;
+        else if(initialY > 20*32) y = 20*32-height-40;
+        else y = initialY;
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setFill(Color.WHITE);
+        gc.fillRoundRect(x-5,y-5,width+10,height+10,10,10);
+        gc.setFill(Color.GRAY);
+        gc.fillRect(x,y,width,height);
+        gc.setFill(Color.BLACK);
+        gc.fillText(text,x+width/2,y+10);
     }
 }

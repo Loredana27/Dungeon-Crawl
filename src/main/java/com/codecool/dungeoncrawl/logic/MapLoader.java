@@ -64,13 +64,13 @@ public class MapLoader {
                             break;
                         case 'a':
                             cell.setType(CellType.FLOOR);
-                            Treasury treasury = new Treasury(cell);
+                            Treasure treasury = new Treasure(cell);
                             map.addItem(treasury.getTileName());
                             break;
                         case 'A':
                             cell.setType(CellType.FLOOR);
-                            TreasuryKey treasuryKey = new TreasuryKey(cell);
-                            map.addItem(treasuryKey.getTileName());
+                            TreasureKey treasureKey = new TreasureKey(cell);
+                            map.addItem(treasureKey.getTileName());
                             break;
                         case 's':
                             cell.setType(CellType.FLOOR);

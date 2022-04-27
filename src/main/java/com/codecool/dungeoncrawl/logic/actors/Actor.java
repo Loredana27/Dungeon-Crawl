@@ -93,15 +93,15 @@ public abstract class Actor implements Drawable{
                     attack += 3;
                     cell.cleanTempItem();
                     break;
-                case "treasury":
+                case "treasure":
                     addItem("bigsword");
                     attack += 7;
                     health += 10;
-                    items.remove("treasurykey");
+                    items.remove("treasurekey");
                     cell.cleanTempItem();
                     break;
-                case "treasurykey":
-                    addItem("treasurykey");
+                case "treasurekey":
+                    addItem("treasurekey");
                     cell.cleanTempItem();
                     break;
             }

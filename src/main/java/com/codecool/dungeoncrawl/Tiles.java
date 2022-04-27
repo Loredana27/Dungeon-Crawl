@@ -33,8 +33,8 @@ public class Tiles {
         tileMap.put("soldier", new Tile(28, 0));
         tileMap.put("grass", new Tile(6, 0));
         tileMap.put("heal", new Tile(24, 22));
-        tileMap.put("treasury", new Tile(12, 31));
-        tileMap.put("treasurykey", new Tile(18, 23));
+        tileMap.put("treasure", new Tile(12, 31));
+        tileMap.put("treasure key", new Tile(18, 23));
         tileMap.put("player", new Tile(27, 0));
         tileMap.put("skeleton", new Tile(29, 6));
         tileMap.put("bat", new Tile(26,8));
