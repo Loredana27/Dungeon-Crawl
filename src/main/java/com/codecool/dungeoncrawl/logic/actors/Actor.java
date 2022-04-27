@@ -8,11 +8,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class Actor implements Drawable{
+
+    private static ArrayList<String> collisionObjects;
     private Cell cell;
     protected int health = 10;
 
     protected int attack;
-
 
 
     private ArrayList<Enemy> enemies;
@@ -24,11 +25,16 @@ public abstract class Actor implements Drawable{
         this.cell.setActor(this);
         items = new HashMap<>();
         setNeighborEnemies();
+        collisionObjects = new ArrayList<>();
+        collisionObjects.add("wall");
+        collisionObjects.add("door");
+        collisionObjects.add("house");
     }
 
     public void move(int dx, int dy) {
         Cell nextCell = cell.getNeighbor(dx, dy);
-        if(!(nextCell.getTileName().equalsIgnoreCase("WALL") || nextCell.getTileName().equalsIgnoreCase("door"))){
+        String nextCellType = nextCell.getTileName();
+        if(!(collisionObjects.contains(nextCellType))){
             if(nextCell.getActor()!= null) {
                 String tileActor = nextCell.getActor().getTileName();
                 switch (tileActor){
