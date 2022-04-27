@@ -49,6 +49,63 @@ public class GameMap {
         return width;
     }
 
+    public HashMap<String,Integer> getBounds(){
+        HashMap<String,Integer> bounds = new HashMap<>();
+        if(width <=25) {
+            bounds.put("minX", 0);
+            bounds.put("maxX",width);
+        }
+        else {
+            int toAddX = 0;
+            if (player.getX() - 12 < 0){
+                toAddX = Math.abs(player.getX() - 12);
+                bounds.put("minX", 0);
+            }else {
+                bounds.put("minX", player.getX() - 12);
+            }
+            int toSubX = 0;
+            if(player.getX() + 13 + toAddX > width){
+                bounds.put("maxX",width);
+                toSubX = player.getX() + 13 + toAddX -width;
+            }
+            else{
+                bounds.put("maxX", player.getX() + 13 + toAddX);
+            }
+            if(bounds.get("minX") - toSubX < 0){
+                bounds.put("minX", 0);
+            }else{
+                bounds.put("minX", bounds.get("minX") - toSubX);
+            }
+        }
+        if(height < 20){
+            bounds.put("minY",0);
+            bounds.put("maxY",height);
+        }
+        else {
+            int toAddY = 0;
+            if (player.getY() - 10 < 0){
+                toAddY = Math.abs(player.getY() - 10);
+                bounds.put("minY", 0);
+            }else {
+                bounds.put("minY", player.getY() - 10);
+            }
+            int toSubY = 0;
+            if(player.getY() + 10 + toAddY > height){
+                bounds.put("maxY",height);
+                toSubY = player.getY() + 10 + toAddY - height;
+            }
+            else{
+                bounds.put("maxY", player.getY() + 10 + toAddY);
+            }
+            if(bounds.get("minY")- toSubY < 0){
+                bounds.put("minY", 0);
+            }
+            else
+                bounds.put("minY",bounds.get("minY")-toSubY);
+        }
+        return bounds;
+    }
+
     public int getHeight() {
         return height;
     }

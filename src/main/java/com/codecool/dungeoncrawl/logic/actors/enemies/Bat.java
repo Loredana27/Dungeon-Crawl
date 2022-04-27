@@ -1,6 +1,7 @@
 package com.codecool.dungeoncrawl.logic.actors.enemies;
 
 import com.codecool.dungeoncrawl.logic.Cell;
+import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.actors.Player;
 
 import java.util.Random;
@@ -30,8 +31,15 @@ public class Bat extends Enemy {
         Random random = new Random();
         int dx = random.nextInt(3) - 1;
         int dy = random.nextInt(3) - 1;
-        if(getCell().getNeighbor(dx,dy).getTileName().equalsIgnoreCase("WALL")) moveToPatrol();
-        else move(dx,dy);
+        Cell nextCell = getCell().getNeighbor(dx,dy);
+        switch (nextCell.getTileName()){
+            case "floor":
+            case "player":
+                move(dx,dy);
+                break;
+            default:
+                moveToPatrol();
+        }
     }
 
     @Override

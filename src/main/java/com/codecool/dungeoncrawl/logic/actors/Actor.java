@@ -24,7 +24,6 @@ public abstract class Actor implements Drawable{
         this.cell = cell;
         this.cell.setActor(this);
         items = new HashMap<>();
-        setNeighborEnemies();
         collisionObjects = new ArrayList<>();
         collisionObjects.add("wall");
         collisionObjects.add("door");
@@ -32,50 +31,84 @@ public abstract class Actor implements Drawable{
     }
 
     public void move(int dx, int dy) {
-        Cell nextCell = cell.getNeighbor(dx, dy);
-        String nextCellType = nextCell.getTileName();
-        if(!(collisionObjects.contains(nextCellType))){
-            if(nextCell.getActor()!= null) {
-                String tileActor = nextCell.getActor().getTileName();
-                switch (tileActor){
-                    case "sword":
-                        if(this instanceof Player)
-                            setAttack(attack + 3);
-                    case "key":
-                        if(this instanceof Player){
-                            this.addItem(nextCell.getActor().getTileName());
-                            cell.setActor(null);
-                            nextCell.setActor(this);
-                            cell = nextCell;
-                        }
-                        break;
-                    case "skeleton":
-                        if(this instanceof Player)
-                            this.isAttacked(nextCell.getActor().getAttack());
-                        break;
-                    case "player":
-                        nextCell.getActor().isAttacked(this.attack);
-                        break;
-                    case "opened-door":
-                        if(this instanceof Player){
-                            cell.setActor(null);
-                            nextCell.setActor(this);
-                            cell = nextCell;
-                        }
-                        break;
+        try {
+            Cell nextCell = cell.getNeighbor(dx, dy);
+            String nextCellType = nextCell.getTileName();
+            if (!(collisionObjects.contains(nextCellType))) {
+                if (nextCell.getActor() != null) {
+                    String tileActor = nextCell.getActor().getTileName();
+                    switch (tileActor) {
+                        case "heal":
+                        case "opened-door":
+                        case "sword":
+                        case "treasurykey":
+                        case "key":
+                            if (this instanceof Player) {
+                                cell.setActor(null);
+                                nextCell.setActor(this);
+                                cell = nextCell;
+                            }
+                            break;
+                        case "treasury":
+                            if (this instanceof Player) {
+                                if(items.containsKey("treasurykey")) {
+                                    cell.setActor(null);
+                                    nextCell.setActor(this);
+                                    cell = nextCell;
+                                }
+                            }
+                            break;
+                        case "skeleton":
+                            if (this instanceof Player)
+                                this.isAttacked(nextCell.getActor().getAttack());
+                            break;
+                        case "player":
+                            nextCell.getActor().isAttacked(this.attack);
+                            break;
+                    }
+                } else {
+                    cell.setActor(null);
+                    nextCell.setActor(this);
+                    cell = nextCell;
                 }
+                setNeighborEnemies();
             }
-            else{
-                cell.setActor(null);
-                nextCell.setActor(this);
-                cell = nextCell;
-            }
-            setNeighborEnemies();
-        }
+        }catch (IndexOutOfBoundsException ignored){}
     }
 
+    public void pickupItem(){
+        try {
+            switch (cell.getTempItem()) {
+                case "heal":
+                    //                addItem("heal");
+                    health += 10;
+                    cell.cleanTempItem();
+                    break;
+                case "key":
+                    addItem("key");
+                    cell.cleanTempItem();
+                    break;
+                case "sword":
+                    addItem("sword");
+                    attack += 3;
+                    cell.cleanTempItem();
+                    break;
+                case "treasury":
+                    addItem("bigsword");
+                    attack += 7;
+                    health += 10;
+                    items.remove("treasurykey");
+                    cell.cleanTempItem();
+                    break;
+                case "treasurykey":
+                    addItem("treasurykey");
+                    cell.cleanTempItem();
+                    break;
+            }
+        }catch (NullPointerException ignored){}
+    }
 
-    private void setNeighborEnemies(){
+    void setNeighborEnemies(){
         enemies = new ArrayList<>();
         for(int dx = -1; dx <= 1; dx++)
             for(int dy = -1; dy <= 1; dy++) {
@@ -92,7 +125,7 @@ public abstract class Actor implements Drawable{
                                     enemies.add((Enemy) enemy);
                             }
                     }catch (IndexOutOfBoundsException ignored){
-                    }
+                    }catch (NullPointerException ignored){}
                 }
             }
     }
@@ -163,5 +196,12 @@ public abstract class Actor implements Drawable{
 
     public ArrayList<Enemy> getEnemies() {
         return enemies;
+    }
+
+    public boolean checkForKey(){
+        return items.containsKey("key");
+    }
+    public boolean checkForTresuryKey(){
+        return items.containsKey("tresurykey");
     }
 }

@@ -1,10 +1,13 @@
 package com.codecool.dungeoncrawl.logic;
 
 import com.codecool.dungeoncrawl.logic.actors.Actor;
+import com.codecool.dungeoncrawl.logic.actors.items.Item;
 
 public class Cell implements Drawable {
     private CellType type;
     private Actor actor;
+
+    private Item tempItem;
     private GameMap gameMap;
     private int x, y;
 
@@ -13,6 +16,7 @@ public class Cell implements Drawable {
         this.x = x;
         this.y = y;
         this.type = type;
+        tempItem = null;
     }
 
     public CellType getType() {
@@ -24,15 +28,32 @@ public class Cell implements Drawable {
     }
 
     public void setActor(Actor actor) {
-        this.actor = actor;
+        if(actor == null )
+            this.actor = tempItem;
+        else{
+            if(this.actor instanceof Item) tempItem = (Item) this.actor;
+            this.actor = actor;
+        }
     }
 
     public Actor getActor() {
         return actor;
     }
 
+    public String getTempItem() {
+        return tempItem.getTileName();
+    }
+
+    public void cleanTempItem(){
+        tempItem = null;
+    }
+
     public Cell getNeighbor(int dx, int dy) {
-        return gameMap.getCell(x + dx, y + dy);
+        try{
+            return gameMap.getCell(x + dx, y + dy);
+        }catch (IndexOutOfBoundsException e){
+            return null;
+        }
     }
 
     @Override

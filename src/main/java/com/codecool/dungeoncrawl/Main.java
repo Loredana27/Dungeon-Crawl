@@ -33,7 +33,7 @@ public class Main extends Application {
     GridPane inventory;
     GridPane itemsToCollect;
     Button exitButton;
-    GameMap map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map2.txt"));
+    GameMap map = MapLoader.loadMap(MapLoader.class.getResourceAsStream("/map.txt"));
     Canvas canvas = new Canvas(
             map.getWidth() * Tiles.TILE_WIDTH,
             map.getHeight() * Tiles.TILE_WIDTH);
@@ -68,7 +68,7 @@ public class Main extends Application {
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png")));
         primaryStage.getIcons().add(icon);
         primaryStage.setTitle("Dungeon Crawl - By L.A");
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         primaryStage.show();
     }
 
@@ -81,68 +81,53 @@ public class Main extends Application {
                             gameRunning = map.getPlayer().startFight(enemy);
                             if(gameRunning) map.removeEnemy(enemy);
                         }
-
                     });
                     refresh();
                     break;
+                case E:
+                    try{
+                        map.removeItem(map.getPlayer().getCell().getTempItem());
+                        map.getPlayer().pickupItem();
+                        refresh();
+                    }catch (NullPointerException ignored){}
+                    break;
                 case UP:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
-                    if(map.getPlayer().getCell().getNeighbor(0, -1).getActor() != null) {
-                        String item = map.getPlayer().getCell().getNeighbor(0, -1).getActor().getTileName();
-                        if (checkForKey(item)) break;
-                    }
                     map.getPlayer().move(0, -1);
+                    if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                        map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     refresh();
                     break;
                 case DOWN:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
-                    if(map.getPlayer().getCell().getNeighbor(0, 1).getActor()!=null) {
-                        String item = map.getPlayer().getCell().getNeighbor(0, 1).getActor().getTileName();
-                        if (checkForKey(item)) break;
-                    }
                     map.getPlayer().move(0, 1);
+                    if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                        map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     refresh();
                     break;
                 case LEFT:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
-                    if(map.getPlayer().getCell().getNeighbor(-1, 0).getActor()!=null) {
-                        String item = map.getPlayer().getCell().getNeighbor(-1, 0).getActor().getTileName();
-                        if(checkForKey(item)) break;
-                    }
+                    if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                        map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     map.getPlayer().move(-1, 0);
                     refresh();
                     break;
                 case RIGHT:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
-                    if(map.getPlayer().getCell().getNeighbor(1, 0).getActor() != null){
-                        String item = map.getPlayer().getCell().getNeighbor(1, 0).getActor().getTileName();
-                        if (checkForKey(item)) break;
-                    }
+                    if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                        map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     map.getPlayer().move(1, 0);
                     refresh();
                     break;
             }
+            if(map.getPlayer().getCell().equals(map.getDoor().getCell())) nextLevel();
 //            System.out.printf("X: %s   Y:%s\n",map.getPlayer().getX(),map.getPlayer().getY());
             checkForEnd();
         }
     }
 
-    private boolean checkForKey(String item) {
-        if (item.equals("opened-door")) {
-            if(map.getPlayer().getItems().containsKey("key")) {
-                map.getPlayer().getItems().remove("key");
-                nextLevel();
-            }
-            return true;
-        } else if (item.equals("sword") || item.equals("key")) {
-            if(item.equals("key")) {
-                Cell cell = map.getDoor().getCell();
-                map.setDoor(new OpenedDoor(cell));
-                cell.setActor(map.getDoor());
-            }
-            if (map.getAvailableItems().containsKey(item)) map.removeItem(item);
-        }
-        return false;
+    private boolean checkForKey() {
+        return map.getPlayer().getItems().containsKey("key");
     }
 
     private void nextLevel() {
@@ -182,11 +167,6 @@ public class Main extends Application {
         itemsToCollect = new GridPane();
         itemsToCollect.getStyleClass().add("itemsToCollect");
         itemsToCollect.getChildren().add(new Label("Available Itemes:"));
-
-//        uiDetails.add(inventory,0,3);
-//        GridPane.setConstraints(inventory,0,3,3,1);
-//        GridPane.setConstraints(itemsToCollect,0,4,3,1);
-//        ui.add(itemsToCollect,0,4);
 
         GridPane exitContainer = new GridPane();
         exitContainer.getStyleClass().add("ExitContainer");
@@ -256,13 +236,16 @@ public class Main extends Application {
     private void refresh() {
         context.setFill(Color.BLACK);
         context.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
+        HashMap<String, Integer> bounds = map.getBounds();
+        int difX = bounds.get("minX");
+        int difY = bounds.get("minY");
+        for (int x = bounds.get("minX"); x < bounds.get("maxX"); x++) {
+            for (int y = bounds.get("minY"); y < bounds.get("maxY"); y++) {
                 Cell cell = map.getCell(x, y);
                 if (cell.getActor() != null) {
-                    Tiles.drawTile(context, cell.getActor(), x, y);
+                    Tiles.drawTile(context, cell.getActor(), x-difX, y-difY);
                 } else {
-                    Tiles.drawTile(context, cell, x, y);
+                    Tiles.drawTile(context, cell, x-difX, y-difY);
                 }
             }
         }
