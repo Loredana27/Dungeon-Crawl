@@ -20,6 +20,10 @@ public class GameMap {
 
     private Door door;
 
+    private Cell portalA;
+
+    private Cell portalB;
+
     public GameMap(int width, int height, CellType defaultCellType) {
         this.width = width;
         this.height = height;
@@ -143,5 +147,35 @@ public class GameMap {
     public void removeItem(String item) {
         availableItems.put(item,availableItems.get(item)-1);
         if(availableItems.get(item) == 0) availableItems.remove(item);
+    }
+
+    public void teleport(){
+        if (player.getCell().equals(portalA)) {
+            Cell portalBspot = getCell(portalB.getX() + 1, portalB.getY());
+            player.getCell().setActor(null);
+            portalBspot.setActor(player);
+            player.setCell(portalBspot);
+        } else if (this.getPlayer().getCell().equals(this.getPortalB())) {
+            Cell portalAspot = getCell(portalA.getX() + 1, portalA.getY());
+            player.getCell().setActor(null);
+            portalAspot.setActor(player);
+            player.setCell(portalAspot);
+        }
+    }
+
+    public Cell getPortalA() {
+        return portalA;
+    }
+
+    public void setPortalA(Cell portalA) {
+        this.portalA = portalA;
+    }
+
+    public Cell getPortalB() {
+        return portalB;
+    }
+
+    public void setPortalB(Cell portalB) {
+        this.portalB = portalB;
     }
 }

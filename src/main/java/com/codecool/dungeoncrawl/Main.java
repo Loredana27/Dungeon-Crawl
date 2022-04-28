@@ -1,6 +1,7 @@
 package com.codecool.dungeoncrawl;
 
 import com.codecool.dungeoncrawl.logic.Cell;
+import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
@@ -83,16 +84,16 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
 
-//        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
-//        refresh();
+        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
+        refresh();
 
-        getPlayerName();
         playSound();
+        getPlayerName();
     }
 
 
     public void playSound(){
-        Media sound = new Media(getClass().getResource("/sounds/Skeleton.mp3").toExternalForm());
+        Media sound = new Media(getClass().getResource("/sounds/music.mp3").toExternalForm());
         MediaPlayer mediaPlayer = new MediaPlayer(sound);
         mediaPlayer.play();
     }
@@ -154,6 +155,12 @@ public class Main extends Application {
                     refresh();
                     break;
             }
+
+            if(map.getPlayer().getCell().getType().equals(CellType.PORTAL)){
+                map.teleport();
+                refresh();
+            }
+            if(map.getPlayer().getCell().getType().equals(CellType.CUP)) showYouWin();
             if(health > map.getPlayer().getHealth()) {
                 text = String.format("You lost %s health points in battle!", health - map.getPlayer().getHealth());
                 showCanvasMessage(text, 190, 20);
@@ -168,11 +175,28 @@ public class Main extends Application {
         inputDialog.initOwner(mainStage);
         inputDialog.setGraphic(null);
         inputDialog.setTitle("Character name needed!");
-        inputDialog.setHeaderText("Please insert your name: ");
-        inputDialog.setContentText("");
-        inputDialog.showAndWait();
-        nameLabel.setText(inputDialog.getEditor().getText());
-        map.getPlayer().setName(inputDialog.getEditor().getText());
+        inputDialog.setHeaderText(null);
+        inputDialog.setContentText("Please insert your name: ");
+        inputDialog.getDialogPane().getStylesheets().add(getClass().getResource("/style/getName.css").toExternalForm());
+        inputDialog.getDialogPane().getStyleClass().add("getInputPane");
+        inputDialog.getEditor().getStyleClass().add("textInput");
+        inputDialog.getDialogPane().getButtonTypes().clear();
+        ButtonType buttonTypeOK = new ButtonType("Insert", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        inputDialog.getDialogPane().getButtonTypes().add(buttonTypeOK);
+        inputDialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+        Optional<String> result = inputDialog.showAndWait();
+        if(result.isPresent() && !result.get().equals("")){
+            try {
+                nameLabel.setText(inputDialog.getEditor().getText());
+                map.getPlayer().setName(inputDialog.getEditor().getText());
+            } catch (Exception e) {
+//                throw new RuntimeException(e);
+                e.printStackTrace();
+            }
+        } else {
+            System.exit(1);
+        }
         refresh();
     }
 
@@ -317,7 +341,6 @@ public class Main extends Application {
         healthLabel.setText("" + map.getPlayer().getHealth());
         attackLabel.setText("" + map.getPlayer().getAttack());
         refreshUI();
-//        showCanvasMessage("Hello!",50,20);
     }
 
     public void showGameOver(){
@@ -343,6 +366,36 @@ public class Main extends Application {
                 restartGame();
             } catch (Exception e) {
 //                throw new RuntimeException(e);
+                e.printStackTrace();
+            }
+        } else if (result.get() == buttonNo) {
+            System.exit(1);
+        }
+    }
+
+
+    public void showYouWin(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,null);
+        alert.setTitle("You Won!");
+        alert.setHeaderText(null);
+        alert.setContentText("");
+        alert.setGraphic(null);
+        alert.initOwner(mainStage);
+
+        alert.getButtonTypes().clear();
+        ButtonType buttonYes = new ButtonType("Yes!", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonNo = new ButtonType("No...Sorry", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().add(0,buttonYes);
+        alert.getButtonTypes().add(1,buttonNo);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/style/youWon.css").toExternalForm());
+        dialogPane.getStyleClass().add("youWonPane");
+        Optional<ButtonType> result = alert.showAndWait();
+        if(result.isPresent() && result.get() == buttonYes){
+            try {
+                restartGame();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else if (result.get() == buttonNo) {

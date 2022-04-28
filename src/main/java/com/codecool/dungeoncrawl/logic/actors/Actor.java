@@ -65,8 +65,9 @@ public abstract class Actor implements Drawable{
                         case "player":
                             nextCell.getActor().isAttacked(this.attack);
                             break;
+
                     }
-                } else {
+                }else {
                     cell.setActor(null);
                     nextCell.setActor(this);
                     cell = nextCell;
@@ -164,6 +165,10 @@ public abstract class Actor implements Drawable{
         return cell;
     }
 
+    public void setCell(Cell cell) {
+        this.cell = cell;
+    }
+
     public int getX() {
         return cell.getX();
     }
@@ -208,10 +213,12 @@ public abstract class Actor implements Drawable{
         return enemies;
     }
 
+
+
     public boolean checkForKey(){
         return items.containsKey("key");
     }
     public boolean checkForTresuryKey(){
-        return items.containsKey("tresurykey");
+        return items.containsKey("tresure key");
     }
 }

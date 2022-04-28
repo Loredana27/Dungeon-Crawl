@@ -106,9 +106,11 @@ public class MapLoader {
                             break;
                         case 'P':
                             cell.setType(CellType.PORTAL);
+                            map.setPortalB(cell);
                             break;
                         case 'p':
                             cell.setType(CellType.PORTAL);
+                            map.setPortalA(cell);
                             break;
                         case 'K':
                             cell.setType(CellType.CUP);
