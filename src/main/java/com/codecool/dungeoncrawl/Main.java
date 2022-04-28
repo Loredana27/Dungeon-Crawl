@@ -1,6 +1,7 @@
 package com.codecool.dungeoncrawl;
 
 import com.codecool.dungeoncrawl.logic.Cell;
+import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
@@ -86,13 +87,13 @@ public class Main extends Application {
 //        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
 //        refresh();
 
-        getPlayerName();
         playSound();
+        getPlayerName();
     }
 
 
     public void playSound(){
-        Media sound = new Media(getClass().getResource("/sounds/Skeleton.mp3").toExternalForm());
+        Media sound = new Media(getClass().getResource("/sounds/music.mp3").toExternalForm());
         MediaPlayer mediaPlayer = new MediaPlayer(sound);
         mediaPlayer.play();
     }
@@ -153,6 +154,11 @@ public class Main extends Application {
                     map.getPlayer().move(1, 0);
                     refresh();
                     break;
+            }
+
+            if(map.getPlayer().getCell().getType().equals(CellType.PORTAL)){
+                map.teleport();
+                refresh();
             }
             if(health > map.getPlayer().getHealth()) {
                 text = String.format("You lost %s health points in battle!", health - map.getPlayer().getHealth());
