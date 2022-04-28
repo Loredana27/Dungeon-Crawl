@@ -4,6 +4,7 @@ import com.codecool.dungeoncrawl.logic.Cell;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -15,11 +16,13 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.io.InputStream;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
@@ -80,7 +83,18 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
 
+//        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
+//        refresh();
+
         getPlayerName();
+        playSound();
+    }
+
+
+    public void playSound(){
+        Media sound = new Media(getClass().getResource("/sounds/Skeleton.mp3").toExternalForm());
+        MediaPlayer mediaPlayer = new MediaPlayer(sound);
+        mediaPlayer.play();
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
@@ -110,28 +124,32 @@ public class Main extends Application {
                 case UP:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     map.getPlayer().move(0, -1);
-                    if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
-                        map.setDoor(new OpenedDoor(map.getDoor().getCell()));
+                    if(map.getDoor() != null)
+                        if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                            map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     refresh();
                     break;
                 case DOWN:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     map.getPlayer().move(0, 1);
-                    if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
-                        map.setDoor(new OpenedDoor(map.getDoor().getCell()));
+                    if(map.getDoor() != null)
+                        if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                            map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     refresh();
                     break;
                 case LEFT:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
-                    if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
-                        map.setDoor(new OpenedDoor(map.getDoor().getCell()));
+                    if(map.getDoor() != null)
+                        if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                            map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     map.getPlayer().move(-1, 0);
                     refresh();
                     break;
                 case RIGHT:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
-                    if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
-                        map.setDoor(new OpenedDoor(map.getDoor().getCell()));
+                    if(map.getDoor() != null)
+                        if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                            map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     map.getPlayer().move(1, 0);
                     refresh();
                     break;
@@ -140,7 +158,7 @@ public class Main extends Application {
                 text = String.format("You lost %s health points in battle!", health - map.getPlayer().getHealth());
                 showCanvasMessage(text, 190, 20);
             }
-            if(map.getPlayer().getCell().equals(map.getDoor().getCell())) nextLevel();
+            if(map.getDoor() != null) if(map.getPlayer().getCell().equals(map.getDoor().getCell())) nextLevel();
             checkForEnd();
         }
     }
@@ -154,6 +172,7 @@ public class Main extends Application {
         inputDialog.setContentText("");
         inputDialog.showAndWait();
         nameLabel.setText(inputDialog.getEditor().getText());
+        map.getPlayer().setName(inputDialog.getEditor().getText());
         refresh();
     }
 
@@ -179,6 +198,7 @@ public class Main extends Application {
         map.getPlayer().setAttack(playerAD);
         map.getPlayer().setHealth(playerHP);
         map.getPlayer().setItems(items);
+        map.getPlayer().setName(nameLabel.getText());
 
         refresh();
     }
@@ -335,6 +355,7 @@ public class Main extends Application {
         map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
         actualMap = 1;
         gameRunning = true;
+        map.getPlayer().setName(nameLabel.getText());
         refresh();
     }
 

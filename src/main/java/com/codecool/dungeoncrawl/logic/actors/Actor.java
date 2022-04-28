@@ -72,8 +72,14 @@ public abstract class Actor implements Drawable{
                     cell = nextCell;
                 }
                 setNeighborEnemies();
-            }
+            } else if(this instanceof Player)
+                if (((Player) this).getName().equals("dev")) {
+                    cell.setActor(null);
+                    nextCell.setActor(this);
+                    cell = nextCell;
+                }
         }catch (IndexOutOfBoundsException ignored){}
+        catch (NullPointerException ignored){}
     }
 
     public void pickupItem(){
@@ -124,8 +130,7 @@ public abstract class Actor implements Drawable{
                                 case "soldier":
                                     enemies.add((Enemy) enemy);
                             }
-                    }catch (IndexOutOfBoundsException ignored){
-                    }catch (NullPointerException ignored){}
+                    }catch (IndexOutOfBoundsException | NullPointerException ignored){}
                 }
             }
     }

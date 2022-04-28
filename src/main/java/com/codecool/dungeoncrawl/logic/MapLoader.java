@@ -101,6 +101,18 @@ public class MapLoader {
                             Key key = new Key(cell);
                             map.addItem(key.getTileName());
                             break;
+                        case 'c':
+                            cell.setType(CellType.GRAVE);
+                            break;
+                        case 'P':
+                            cell.setType(CellType.PORTAL);
+                            break;
+                        case 'p':
+                            cell.setType(CellType.PORTAL);
+                            break;
+                        case 'K':
+                            cell.setType(CellType.CUP);
+                            break;
                         default:
                             throw new RuntimeException("Unrecognized character: '" + line.charAt(x) + "'");
                     }

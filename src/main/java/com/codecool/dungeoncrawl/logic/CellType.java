@@ -7,7 +7,10 @@ public enum CellType {
     TREE("tree"),
     HOUSE("house"),
     GRASS("grass"),
-    WALL("wall");
+    WALL("wall"),
+    GRAVE("grave"),
+    PORTAL("portal"),
+    CUP("cup");
 
 
     private final String tileName;
