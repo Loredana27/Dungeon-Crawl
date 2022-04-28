@@ -1,0 +1,41 @@
+.menubar{
+    -fx-background-color: black;
+}
+
+.menubar .menu:hover{
+    -fx-background-color: #1a1a1a;
+    -fx-text-fill: white;
+}
+
+.menubar .menu{
+    -fx-background-color: black;
+    -fx-font-size: 15;
+}
+
+.menubar .menu:showing{
+    -fx-background-color: #414141;
+}
+
+.menubar .menu:showing .context-menu {
+    -fx-background-color: #414141;
+    -fx-background-radius: 0 0 10 10;
+    -fx-effect: dropshadow(two-pass-box,white,5,0,0,5);
+}
+
+.menubar .menu:showing .context-menu .menu-item{
+    -fx-background-insets: 5 0 5 0;
+}
+
+
+.menubar .menu:showing .context-menu .menu-item:hover,
+.menubar .menu:showing .context-menu .menu-item:focused{
+    -fx-background-color: #414141;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(two-pass-box,white,5,0,0,0);
+}
+
+.menubar .menu .label{
+    -fx-text-fill: #7bff00;
+    -fx-font-weight: bold;
+}
+

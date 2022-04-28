@@ -1,0 +1,23 @@
+.aboutPane{
+    -fx-background-image: url("/about.png");
+    -fx-min-width: 760;
+    -fx-min-height: 500;
+    -fx-max-width: 750;
+    -fx-max-height: 500;
+}
+
+.aboutPane Button{
+    -fx-background-radius: 15;
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+    -fx-effect: dropshadow(three-pass-box, white, 10, 0, 0, 0);
+    -fx-font-size: 15;
+    -fx-translate-x: -320;
+    -fx-text-fill: #131313;
+    -fx-font-weight: bold;
+}
+
+.aboutPane Button:hover{
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 0, 0.43), 10, 0, 0, 0);
+    -fx-text-fill: #858585;
+}

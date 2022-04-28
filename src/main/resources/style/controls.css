@@ -1,0 +1,23 @@
+.controlPane{
+    -fx-background-image: url("/controls.png");
+    -fx-min-width: 800;
+    -fx-min-height: 219;
+    -fx-max-width: 800;
+    -fx-max-height: 219;
+}
+
+.controlPane Button{
+    -fx-background-radius: 15;
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+    -fx-effect: dropshadow(three-pass-box, white, 10, 0, 0, 0);
+    -fx-end-margin: 360;
+    -fx-font-size: 15;
+    -fx-text-fill: #131313;
+    -fx-font-weight: bold;
+}
+
+.controlPane Button:hover{
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 0, 0.43), 10, 0, 0, 0);
+    -fx-text-fill: #858585;
+}

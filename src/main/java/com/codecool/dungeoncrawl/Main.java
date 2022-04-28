@@ -8,6 +8,7 @@ import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -67,6 +68,8 @@ public class Main extends Application {
 
         BorderPane borderPane = new BorderPane();
 
+
+        borderPane.setTop(initMenuBar());
         borderPane.setCenter(canvas);
         borderPane.setRight(uiContainer);
 
@@ -80,12 +83,12 @@ public class Main extends Application {
 
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png")));
         primaryStage.getIcons().add(icon);
-        primaryStage.setTitle("Dungeon Crawl - By L.A");
+        primaryStage.setTitle("Dungeon Crawl By L.A");
         primaryStage.setResizable(false);
         primaryStage.show();
 
-        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
-        refresh();
+//        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
+//        refresh();
 
         playSound();
         getPlayerName();
@@ -112,6 +115,9 @@ public class Main extends Application {
                     });
                     refresh();
                     break;
+                case H:
+                    showControlsDialog();
+                    break;
                 case E:
                     try{
                         String item = map.getPlayer().getCell().getTempItem();
@@ -123,6 +129,7 @@ public class Main extends Application {
                     }catch (NullPointerException ignored){}
                     break;
                 case UP:
+                case W:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     map.getPlayer().move(0, -1);
                     if(map.getDoor() != null)
@@ -131,6 +138,7 @@ public class Main extends Application {
                     refresh();
                     break;
                 case DOWN:
+                case S:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     map.getPlayer().move(0, 1);
                     if(map.getDoor() != null)
@@ -139,6 +147,7 @@ public class Main extends Application {
                     refresh();
                     break;
                 case LEFT:
+                case A:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     if(map.getDoor() != null)
                         if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
@@ -147,6 +156,7 @@ public class Main extends Application {
                     refresh();
                     break;
                 case RIGHT:
+                case D:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     if(map.getDoor() != null)
                         if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
@@ -225,6 +235,54 @@ public class Main extends Application {
         map.getPlayer().setName(nameLabel.getText());
 
         refresh();
+    }
+
+    private MenuBar initMenuBar(){
+        MenuBar menuBar = new MenuBar();
+        menuBar.getStyleClass().add("menubar");
+        menuBar.getStylesheets().add(getClass().getResource("/style/menubar.css").toExternalForm());
+
+        Menu gameMenu = new Menu("Game");
+        gameMenu.getStyleClass().add("menu");
+
+        MenuItem newGame = new MenuItem("New Game");
+        MenuItem saveGameDB = new MenuItem("Save Game in Database");
+        MenuItem saveGameFile = new MenuItem("Save Game in File");
+        MenuItem loadDBGame = new MenuItem("Load Database Game");
+        MenuItem loadFileGame = new MenuItem("Load File Game");
+        MenuItem exit = new MenuItem("Exit");
+        newGame.setOnAction(e->{
+            getPlayerName();
+            restartGame();
+        });
+        exit.setOnAction(e-> System.exit(1));
+
+        gameMenu.getItems().add(newGame);
+        gameMenu.getItems().add(saveGameDB);
+        gameMenu.getItems().add(saveGameFile);
+        gameMenu.getItems().add(loadDBGame);
+        gameMenu.getItems().add(loadFileGame);
+        gameMenu.getItems().add(exit);
+
+
+
+        Menu help = new Menu("Help");
+//        help.getStyleClass().add("menu");
+
+
+        MenuItem controls = new MenuItem("Controls");
+        MenuItem about = new MenuItem("About...");
+
+        controls.setOnAction(e -> showControlsDialog());
+        about.setOnAction(e -> showAboutDialog());
+
+        help.getItems().add(controls);
+        help.getItems().add(about);
+
+
+        menuBar.getMenus().add(gameMenu);
+        menuBar.getMenus().add(help);
+        return menuBar;
     }
 
     private void initUI(){
@@ -433,5 +491,43 @@ public class Main extends Application {
         gc.fillRect(x,y,width,height);
         gc.setFill(Color.BLACK);
         gc.fillText(text,x+width/2,y+10);
+    }
+
+
+    public void showControlsDialog(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.initOwner(mainStage);
+        alert.setHeaderText(null);
+        alert.setGraphic(null);
+        alert.setTitle("How to Play");
+        alert.getDialogPane().getStyleClass().add("controlPane");
+        alert.getDialogPane().getStylesheets().add(getClass().getResource("/style/controls.css").toExternalForm());
+
+        System.out.println(alert.getButtonTypes());
+        alert.getButtonTypes().clear();
+        ButtonType buttonTypeOK = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
+        alert.getButtonTypes().add(buttonTypeOK);
+
+        alert.showAndWait();
+    }
+
+    public void showAboutDialog(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.initOwner(mainStage);
+        alert.setHeaderText(null);
+        alert.setGraphic(null);
+        alert.setTitle("About the L.A team");
+        alert.getDialogPane().getStyleClass().add("aboutPane");
+        alert.getDialogPane().getStylesheets().add(getClass().getResource("/style/about.css").toExternalForm());
+
+        System.out.println(alert.getButtonTypes());
+        alert.getButtonTypes().clear();
+        ButtonType buttonTypeOK = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
+//        alert.getButtonTypes().set(0,)
+        alert.getButtonTypes().add(buttonTypeOK);
+        Button closeButton = (Button) alert.getDialogPane().lookupButton(buttonTypeOK);
+        closeButton.setAlignment(Pos.CENTER);
+
+        alert.showAndWait();
     }
 }
