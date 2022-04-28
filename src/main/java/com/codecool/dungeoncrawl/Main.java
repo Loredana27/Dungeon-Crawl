@@ -24,7 +24,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
@@ -87,8 +86,6 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
 
-//        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
-//        refresh();
 
         playSound();
         getPlayerName();
@@ -125,7 +122,7 @@ public class Main extends Application {
                         map.getPlayer().pickupItem();
                         refresh();
                         text = String.format("You picked up a %s!",item);
-                        showCanvasMessage(text,140,20);
+                        showCanvasMessage(text,140);
                     }catch (NullPointerException ignored){}
                     break;
                 case UP:
@@ -173,7 +170,7 @@ public class Main extends Application {
             if(map.getPlayer().getCell().getType().equals(CellType.CUP)) showYouWin();
             if(health > map.getPlayer().getHealth()) {
                 text = String.format("You lost %s health points in battle!", health - map.getPlayer().getHealth());
-                showCanvasMessage(text, 190, 20);
+                showCanvasMessage(text, 190);
             }
             if(map.getDoor() != null) if(map.getPlayer().getCell().equals(map.getDoor().getCell())) nextLevel();
             checkForEnd();
@@ -201,7 +198,6 @@ public class Main extends Application {
                 nameLabel.setText(inputDialog.getEditor().getText());
                 map.getPlayer().setName(inputDialog.getEditor().getText());
             } catch (Exception e) {
-//                throw new RuntimeException(e);
                 e.printStackTrace();
             }
         } else {
@@ -265,9 +261,7 @@ public class Main extends Application {
         gameMenu.getItems().add(exit);
 
 
-
         Menu help = new Menu("Help");
-//        help.getStyleClass().add("menu");
 
 
         MenuItem controls = new MenuItem("Controls");
@@ -470,7 +464,7 @@ public class Main extends Application {
         refresh();
     }
 
-    private void showCanvasMessage(String text ,double width, double height){
+    private void showCanvasMessage(String text ,double width){
         double x;
         double y;
         double playerX = map.getPlayer().getX() < 12 ? map.getPlayer().getX() : (map.getPlayer().getX() < map.getWidth() - 13 ? 12 : map.getWidth()-25+map.getPlayer().getX());
@@ -478,17 +472,17 @@ public class Main extends Application {
         if(initialX < 0) x = 5;
         else if(initialX + width > 25*32) x = 25*32 - width - 30;
         else x = initialX;
-        double initialY = map.getPlayer().getY()*32-height;
+        double initialY = map.getPlayer().getY()*32- (double) 20;
         if(initialY < 0) y = 10;
-        else if(initialY > 20*32) y = 20*32-height-40;
+        else if(initialY > 20*32) y = 20*32- (double) 20 -40;
         else y = initialY;
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
         gc.setFill(Color.WHITE);
-        gc.fillRoundRect(x-5,y-5,width+10,height+10,10,10);
+        gc.fillRoundRect(x-5,y-5,width+10, (double) 20 +10,10,10);
         gc.setFill(Color.GRAY);
-        gc.fillRect(x,y,width,height);
+        gc.fillRect(x,y,width, 20);
         gc.setFill(Color.BLACK);
         gc.fillText(text,x+width/2,y+10);
     }
