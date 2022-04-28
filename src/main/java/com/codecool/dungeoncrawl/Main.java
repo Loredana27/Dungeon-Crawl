@@ -210,6 +210,7 @@ public class Main extends Application {
         int playerAD = map.getPlayer().getAttack();
         int playerHP = map.getPlayer().getHealth();
         HashMap<String,Integer> items = map.getPlayer().getItems();
+        items.remove("key");
         String nextMap;
         if(actualMap == 1) {
             nextMap = secondMap;
