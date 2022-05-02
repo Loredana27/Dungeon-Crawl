@@ -56,39 +56,49 @@ public class Main extends Application {
     boolean gameRunning = true;
 
     public static void main(String[] args) {
+        System.out.println("Start running...");
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage){
-        mainStage = primaryStage;
+        try{
+            mainStage = primaryStage;
 
-        initUI();
+            initUI();
 
-        BorderPane borderPane = new BorderPane();
+            BorderPane borderPane = new BorderPane();
 
 
-        borderPane.setTop(initMenuBar());
-        borderPane.setCenter(canvas);
-        borderPane.setRight(uiContainer);
+            borderPane.setTop(initMenuBar());
+            borderPane.setCenter(canvas);
+            borderPane.setRight(uiContainer);
 
-        scene = new Scene(borderPane);
-        mainStage.setScene(scene);
+            scene = new Scene(borderPane);
+            mainStage.setScene(scene);
 
-        canvas.setFocusTraversable(true);
-        uiContainer.setFocusTraversable(true);
-        scene.addEventHandler(KeyEvent.KEY_PRESSED,this::onKeyPressed);
-        refresh();
+            canvas.setFocusTraversable(true);
+            uiContainer.setFocusTraversable(true);
+            scene.addEventHandler(KeyEvent.KEY_PRESSED, this::onKeyPressed);
+            refresh();
 
+
+            showMainStage();
+
+            playSound();
+            getPlayerName();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public void showMainStage(){
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png")));
-        primaryStage.getIcons().add(icon);
-        primaryStage.setTitle("Dungeon Crawl By L.A");
-        primaryStage.setResizable(false);
-        primaryStage.show();
-
-
-        playSound();
-        getPlayerName();
+        mainStage.getIcons().add(icon);
+        mainStage.setTitle("Dungeon Crawl By L.A");
+        mainStage.setResizable(false);
+        mainStage.show();
     }
 
 
@@ -201,7 +211,7 @@ public class Main extends Application {
                 e.printStackTrace();
             }
         } else {
-            System.exit(1);
+            System.exit(0);
         }
         refresh();
     }
@@ -252,7 +262,7 @@ public class Main extends Application {
             getPlayerName();
             restartGame();
         });
-        exit.setOnAction(e-> System.exit(1));
+        exit.setOnAction(e-> System.exit(0));
 
         gameMenu.getItems().add(newGame);
         gameMenu.getItems().add(saveGameDB);
@@ -365,7 +375,7 @@ public class Main extends Application {
 
 
     private void exit(){
-        System.exit(1);
+        System.exit(0);
     }
 
     private void checkForEnd(){
@@ -422,7 +432,7 @@ public class Main extends Application {
                 e.printStackTrace();
             }
         } else if (result.get() == buttonNo) {
-            System.exit(1);
+            System.exit(0);
         }
     }
 
@@ -452,7 +462,7 @@ public class Main extends Application {
                 e.printStackTrace();
             }
         } else if (result.get() == buttonNo) {
-            System.exit(1);
+            System.exit(0);
         }
     }
 
@@ -498,7 +508,6 @@ public class Main extends Application {
         alert.getDialogPane().getStyleClass().add("controlPane");
         alert.getDialogPane().getStylesheets().add(getClass().getResource("/style/controls.css").toExternalForm());
 
-        System.out.println(alert.getButtonTypes());
         alert.getButtonTypes().clear();
         ButtonType buttonTypeOK = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
         alert.getButtonTypes().add(buttonTypeOK);
@@ -515,7 +524,6 @@ public class Main extends Application {
         alert.getDialogPane().getStyleClass().add("aboutPane");
         alert.getDialogPane().getStylesheets().add(getClass().getResource("/style/about.css").toExternalForm());
 
-        System.out.println(alert.getButtonTypes());
         alert.getButtonTypes().clear();
         ButtonType buttonTypeOK = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
 //        alert.getButtonTypes().set(0,)
