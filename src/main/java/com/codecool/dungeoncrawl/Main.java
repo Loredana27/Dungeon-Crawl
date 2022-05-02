@@ -5,7 +5,6 @@ import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,6 +14,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -32,8 +32,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Main extends Application {
     Stage mainStage;
     Scene scene;
+    BorderPane borderPane;
 
-    int actualMap = 1;
+    int actualMap = 0;
     String firstMap= "/map.txt";
     String secondMap = "/map2.txt";
     String thirdMap= "/map3.txt";
@@ -45,15 +46,17 @@ public class Main extends Application {
     GridPane inventory;
     GridPane itemsToCollect;
     Button exitButton;
-    GameMap map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
-    Canvas canvas = new Canvas(
-            map.getWidth() * Tiles.TILE_WIDTH,
-            map.getHeight() * Tiles.TILE_WIDTH);
-    GraphicsContext context = canvas.getGraphicsContext2D();
+    Button musicButton;
+    GameMap map;
+    Canvas canvas;
+    GraphicsContext context;
     Label healthLabel = new Label();
     Label attackLabel = new Label();
     Label nameLabel = new Label();
-    boolean gameRunning = true;
+    boolean gameRunning = false;
+
+    Media sound = new Media(Objects.requireNonNull(getClass().getResource("/sounds/music.mp3")).toExternalForm());
+    MediaPlayer mediaPlayer = new MediaPlayer(sound);
 
     public static void main(String[] args) {
         System.out.println("Start running...");
@@ -65,31 +68,62 @@ public class Main extends Application {
         try{
             mainStage = primaryStage;
 
-            initUI();
 
-            BorderPane borderPane = new BorderPane();
+            borderPane = new BorderPane();
+            gameRunning = false;
 
 
-            borderPane.setTop(initMenuBar());
-            borderPane.setCenter(canvas);
-            borderPane.setRight(uiContainer);
+            startApplicationState();
 
             scene = new Scene(borderPane);
             mainStage.setScene(scene);
 
-            canvas.setFocusTraversable(true);
             uiContainer.setFocusTraversable(true);
             scene.addEventHandler(KeyEvent.KEY_PRESSED, this::onKeyPressed);
-            refresh();
 
-
+            mainStage.setHeight(708.7999877929688);
+            mainStage.setWidth(1014.4000244140625);
             showMainStage();
+            System.out.println(mainStage.getHeight());
+            System.out.println(mainStage.getWidth());
 
-            playSound();
-            getPlayerName();
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void startApplicationState(){
+        initStartApplicationstateUI();
+        borderPane.setTop(initMenuBar());
+        borderPane.setCenter(new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("/icon.png")).toExternalForm())));
+        borderPane.setRight(uiContainer);
+    }
+
+    public void initStartApplicationstateUI(){
+        initUI();
+        uiDetails.getChildren().clear();
+        inventory.getChildren().clear();
+        itemsToCollect.getChildren().clear();
+        Button startGameButton = new Button("Start Game");
+        startGameButton.setOnAction(MouseEvent -> {
+            map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
+            canvas = new Canvas(
+                    map.getWidth() * Tiles.TILE_WIDTH,
+                    map.getHeight() * Tiles.TILE_WIDTH);
+            context = canvas.getGraphicsContext2D();
+            getPlayerName();
+            initUI();
+            restartGame();
+            uiContainer.setFocusTraversable(true);
+            canvas.setFocusTraversable(true);
+            borderPane.setCenter(canvas);
+
+            refresh();
+
+        });
+        uiDetails.add(startGameButton,1,0);
+        uiContainer.setTop(uiDetails);
+        uiContainer.setCenter(ui);
     }
 
 
@@ -103,21 +137,28 @@ public class Main extends Application {
 
 
     public void playSound(){
-        Media sound = new Media(getClass().getResource("/sounds/music.mp3").toExternalForm());
-        MediaPlayer mediaPlayer = new MediaPlayer(sound);
         mediaPlayer.play();
+        musicButton.setText("Music OFF");
+        musicButton.setOnMouseClicked(mouseEvent -> stopSound());
+    }
+
+    public void stopSound(){
+        mediaPlayer.stop();
+        musicButton.setText("Music ON");
+        musicButton.setOnMouseClicked(mouseEvent -> playSound());
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
-        if (gameRunning) {
+        if(gameRunning) {
+            borderPane.setCenter(canvas);
             String text;
             int health = map.getPlayer().getHealth();
             switch (keyEvent.getCode()) {
                 case SPACE:
                     map.getPlayer().getEnemies().forEach(enemy -> {
-                        if(map.getPlayer().getHealth() > 0) {
+                        if (map.getPlayer().getHealth() > 0) {
                             gameRunning = map.getPlayer().startFight(enemy);
-                            if(gameRunning) map.removeEnemy(enemy);
+                            if (gameRunning) map.removeEnemy(enemy);
                         }
                     });
                     refresh();
@@ -126,21 +167,22 @@ public class Main extends Application {
                     showControlsDialog();
                     break;
                 case E:
-                    try{
+                    try {
                         String item = map.getPlayer().getCell().getTempItem();
                         map.removeItem(map.getPlayer().getCell().getTempItem());
                         map.getPlayer().pickupItem();
                         refresh();
-                        text = String.format("You picked up a %s!",item);
-                        showCanvasMessage(text,140);
-                    }catch (NullPointerException ignored){}
+                        text = String.format("You picked up a %s!", item);
+                        showCanvasMessage(text, 140);
+                    } catch (NullPointerException ignored) {
+                    }
                     break;
                 case UP:
                 case W:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     map.getPlayer().move(0, -1);
-                    if(map.getDoor() != null)
-                        if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                    if (map.getDoor() != null)
+                        if (map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
                             map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     refresh();
                     break;
@@ -148,16 +190,16 @@ public class Main extends Application {
                 case S:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
                     map.getPlayer().move(0, 1);
-                    if(map.getDoor() != null)
-                        if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                    if (map.getDoor() != null)
+                        if (map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
                             map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     refresh();
                     break;
                 case LEFT:
                 case A:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
-                    if(map.getDoor() != null)
-                        if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                    if (map.getDoor() != null)
+                        if (map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
                             map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     map.getPlayer().move(-1, 0);
                     refresh();
@@ -165,27 +207,28 @@ public class Main extends Application {
                 case RIGHT:
                 case D:
                     map.getGameAI().forEach(AI -> AI.chooseAMove(map.getPlayer()));
-                    if(map.getDoor() != null)
-                        if(map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
+                    if (map.getDoor() != null)
+                        if (map.getPlayer().checkForKey() && map.getDoor().getTileName().equals("door"))
                             map.setDoor(new OpenedDoor(map.getDoor().getCell()));
                     map.getPlayer().move(1, 0);
                     refresh();
                     break;
             }
 
-            if(map.getPlayer().getCell().getType().equals(CellType.PORTAL)){
+            if (map.getPlayer().getCell().getType().equals(CellType.PORTAL)) {
                 map.teleport();
                 refresh();
             }
-            if(map.getPlayer().getCell().getType().equals(CellType.CUP)) showYouWin();
-            if(health > map.getPlayer().getHealth()) {
+            if (map.getPlayer().getCell().getType().equals(CellType.CUP)) showYouWin();
+            if (health > map.getPlayer().getHealth()) {
                 text = String.format("You lost %s health points in battle!", health - map.getPlayer().getHealth());
                 showCanvasMessage(text, 190);
             }
-            if(map.getDoor() != null) if(map.getPlayer().getCell().equals(map.getDoor().getCell())) nextLevel();
+            if (map.getDoor() != null) if (map.getPlayer().getCell().equals(map.getDoor().getCell())) nextLevel();
             checkForEnd();
         }
     }
+
 
     private void getPlayerName(){
         TextInputDialog inputDialog = new TextInputDialog();
@@ -194,7 +237,7 @@ public class Main extends Application {
         inputDialog.setTitle("Character name needed!");
         inputDialog.setHeaderText(null);
         inputDialog.setContentText("Please insert your name: ");
-        inputDialog.getDialogPane().getStylesheets().add(getClass().getResource("/style/getName.css").toExternalForm());
+        inputDialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/getName.css")).toExternalForm());
         inputDialog.getDialogPane().getStyleClass().add("getInputPane");
         inputDialog.getEditor().getStyleClass().add("textInput");
         inputDialog.getDialogPane().getButtonTypes().clear();
@@ -213,7 +256,7 @@ public class Main extends Application {
         } else {
             System.exit(0);
         }
-        refresh();
+//        refresh();
     }
 
     private void nextLevel() {
@@ -247,7 +290,7 @@ public class Main extends Application {
     private MenuBar initMenuBar(){
         MenuBar menuBar = new MenuBar();
         menuBar.getStyleClass().add("menubar");
-        menuBar.getStylesheets().add(getClass().getResource("/style/menubar.css").toExternalForm());
+        menuBar.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/menubar.css")).toExternalForm());
 
         Menu gameMenu = new Menu("Game");
         gameMenu.getStyleClass().add("menu");
@@ -293,7 +336,7 @@ public class Main extends Application {
     private void initUI(){
         uiContainer = new BorderPane();
         uiContainer.getStyleClass().add("mainPain");
-        uiContainer.getStylesheets().add(getClass().getResource("/style/ui.css").toExternalForm());
+        uiContainer.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/ui.css")).toExternalForm());
 
         uiDetails = new GridPane();
         uiDetails.getStyleClass().add("GridPane");
@@ -325,12 +368,14 @@ public class Main extends Application {
 
         exitButton = new Button("Exit");
         exitButton.setOnAction(MouseEvent -> exit());
-
-        exitContainer.add(exitButton, 1,0);
+        musicButton = new Button("Music ON");
+        musicButton.setOnMouseClicked(mouseEvent -> playSound());
+//        exitContainer.add(exitButton, 1,1);
+        exitContainer.add(musicButton,1,0);
 
         uiContainer.setTop(uiDetails);
         uiContainer.setBottom(exitContainer);
-
+        borderPane.setRight(uiContainer);
     }
 
     private void refreshUI(){
@@ -395,14 +440,15 @@ public class Main extends Application {
             for (int y = bounds.get("minY"); y < bounds.get("maxY"); y++) {
                 Cell cell = map.getCell(x, y);
                 if (cell.getActor() != null) {
-                    Tiles.drawTile(context, cell.getActor(), x-difX, y-difY);
+                    Tiles.drawTile(context, cell.getActor(), x - difX, y - difY);
                 } else {
-                    Tiles.drawTile(context, cell, x-difX, y-difY);
+                    Tiles.drawTile(context, cell, x - difX, y - difY);
                 }
             }
         }
         healthLabel.setText("" + map.getPlayer().getHealth());
         attackLabel.setText("" + map.getPlayer().getAttack());
+
         refreshUI();
     }
 
@@ -421,7 +467,7 @@ public class Main extends Application {
         alert.getButtonTypes().add(1,buttonNo);
 
         DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("/style/gameOver.css").toExternalForm());
+        dialogPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/gameOver.css")).toExternalForm());
         dialogPane.getStyleClass().add("gameOverPane");
         Optional<ButtonType> result = alert.showAndWait();
         if(result.isPresent() && result.get() == buttonYes){
@@ -431,8 +477,8 @@ public class Main extends Application {
 //                throw new RuntimeException(e);
                 e.printStackTrace();
             }
-        } else if (result.get() == buttonNo) {
-            System.exit(0);
+        } else if (result.isPresent() && result.get() == buttonNo) {
+            startApplicationState();
         }
     }
 
@@ -452,7 +498,7 @@ public class Main extends Application {
         alert.getButtonTypes().add(1,buttonNo);
 
         DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("/style/youWon.css").toExternalForm());
+        dialogPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/youWon.css")).toExternalForm());
         dialogPane.getStyleClass().add("youWonPane");
         Optional<ButtonType> result = alert.showAndWait();
         if(result.isPresent() && result.get() == buttonYes){
@@ -461,8 +507,8 @@ public class Main extends Application {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (result.get() == buttonNo) {
-            System.exit(0);
+        } else if (result.isPresent() && result.get() == buttonNo) {
+            startApplicationState();
         }
     }
 
@@ -506,7 +552,7 @@ public class Main extends Application {
         alert.setGraphic(null);
         alert.setTitle("How to Play");
         alert.getDialogPane().getStyleClass().add("controlPane");
-        alert.getDialogPane().getStylesheets().add(getClass().getResource("/style/controls.css").toExternalForm());
+        alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/controls.css")).toExternalForm());
 
         alert.getButtonTypes().clear();
         ButtonType buttonTypeOK = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
@@ -522,11 +568,10 @@ public class Main extends Application {
         alert.setGraphic(null);
         alert.setTitle("About the L.A team");
         alert.getDialogPane().getStyleClass().add("aboutPane");
-        alert.getDialogPane().getStylesheets().add(getClass().getResource("/style/about.css").toExternalForm());
+        alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/about.css")).toExternalForm());
 
         alert.getButtonTypes().clear();
         ButtonType buttonTypeOK = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
-//        alert.getButtonTypes().set(0,)
         alert.getButtonTypes().add(buttonTypeOK);
         Button closeButton = (Button) alert.getDialogPane().lookupButton(buttonTypeOK);
         closeButton.setAlignment(Pos.CENTER);
