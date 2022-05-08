@@ -92,14 +92,14 @@ public class Main extends Application {
         }
     }
 
-    public void startApplicationState(){
+    private void startApplicationState(){
         initStartApplicationstateUI();
         borderPane.setTop(initMenuBar());
-        borderPane.setCenter(new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("/main.png")).toExternalForm())));
+        borderPane.setCenter(new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("/main2.png")).toExternalForm())));
         borderPane.setRight(uiContainer);
     }
 
-    public void initStartApplicationstateUI(){
+    private void initStartApplicationstateUI(){
         initUI();
         uiDetails.getChildren().clear();
         inventory.getChildren().clear();
@@ -132,7 +132,7 @@ public class Main extends Application {
     }
 
 
-    public void showMainStage(){
+    private void showMainStage(){
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png")));
         mainStage.getIcons().add(icon);
         mainStage.setTitle("Dungeon Crawl By L.A");
@@ -143,13 +143,13 @@ public class Main extends Application {
     }
 
 
-    public void playSound(){
+    private void playSound(){
         mediaPlayer.play();
         musicButton.setText("Music OFF");
         musicButton.setOnMouseClicked(mouseEvent -> stopSound());
     }
 
-    public void stopSound(){
+    private void stopSound(){
         mediaPlayer.stop();
         musicButton.setText("Music ON");
         musicButton.setOnMouseClicked(mouseEvent -> playSound());
@@ -269,7 +269,6 @@ public class Main extends Application {
                 e.printStackTrace();
             }
         }
-//        refresh();
     }
 
     private void nextLevel() {
@@ -384,7 +383,7 @@ public class Main extends Application {
         exitButton.setOnAction(MouseEvent -> exit());
         musicButton = new Button("Music ON");
         musicButton.setOnMouseClicked(mouseEvent -> playSound());
-//        exitContainer.add(exitButton, 1,1);
+
         exitContainer.add(musicButton,1,0);
 
         uiContainer.setTop(uiDetails);
@@ -404,7 +403,7 @@ public class Main extends Application {
         uiContainer.setCenter(ui);
     }
 
-    private void refreshInventory(){
+    public void refreshInventory(){
         inventory = new GridPane();
         AtomicInteger row = new AtomicInteger(1);
         Label label = new Label("Inventory:");
@@ -418,7 +417,7 @@ public class Main extends Application {
         });
     }
 
-    private void refreshItems(){
+    public void refreshItems(){
         itemsToCollect = new GridPane();
         AtomicInteger row = new AtomicInteger(1);
         Label label = new Label("Available items: ");
@@ -437,7 +436,7 @@ public class Main extends Application {
         System.exit(0);
     }
 
-    private void checkForEnd(){
+    public void checkForEnd(){
         if(map.getPlayer().getHealth()<=0) {
             gameRunning = false;
             showGameOver();
@@ -466,7 +465,7 @@ public class Main extends Application {
         refreshUI();
     }
 
-    public void showGameOver(){
+    private void showGameOver(){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION,null);
         alert.setTitle("You lost!");
         alert.setHeaderText(null);
@@ -495,10 +494,10 @@ public class Main extends Application {
                 try {
                     restartGame();
                 } catch (Exception e) {
-//                throw new RuntimeException(e);
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             } else if (result.isPresent() && result.get() == buttonNo) {
+                nameLabel.setText("");
                 ui = null;
                 startApplicationState();
             }
@@ -506,7 +505,7 @@ public class Main extends Application {
     }
 
 
-    public void showYouWin(){
+    private void showYouWin(){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION,null);
         alert.setTitle("You Won!");
         alert.setHeaderText(null);
@@ -540,6 +539,7 @@ public class Main extends Application {
                         e.printStackTrace();
                     }
                 } else if (result.isPresent() && result.get() == buttonNo) {
+                    nameLabel.setText("");
                     startApplicationState();
                 }
             });
@@ -547,7 +547,7 @@ public class Main extends Application {
     }
 
 
-    private void restartGame(){
+    public void restartGame(){
         map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
         actualMap = 1;
         gameRunning = true;
@@ -579,7 +579,7 @@ public class Main extends Application {
     }
 
 
-    public void showControlsDialog(){
+    private void showControlsDialog(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.initOwner(mainStage);
         alert.setHeaderText(null);
@@ -599,7 +599,7 @@ public class Main extends Application {
         alert.setY(getScreenHeight()/2 - alert.getHeight()/2);
     }
 
-    public void showAboutDialog(){
+    private void showAboutDialog(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.initOwner(mainStage);
         alert.setHeaderText(null);
@@ -617,6 +617,22 @@ public class Main extends Application {
         alert.show();
         alert.setX(getScreenWidth()/2 - alert.getWidth()/2);
         alert.setY(getScreenHeight()/2 - alert.getHeight()/2);
+    }
+
+    private void saveDatabaseGame(){
+
+    }
+
+    private void loadDatabaseGame(int gameId){
+
+    }
+
+    private void saveFileGame(){
+
+    }
+
+    private void loadFileGame(String path){
+
     }
 
     private double getScreenWidth(){
