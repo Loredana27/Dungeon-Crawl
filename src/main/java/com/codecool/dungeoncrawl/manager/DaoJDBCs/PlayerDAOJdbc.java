@@ -1,14 +1,13 @@
-package manager;
+package com.codecool.dungeoncrawl.manager.DaoJDBCs;
 
-import com.codecool.dungeoncrawl.logic.actors.Player;
+import com.codecool.dungeoncrawl.manager.DAOs.PlayerDAO;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
 
 public class PlayerDAOJdbc {
 
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     public PlayerDAOJdbc(DataSource dataSource) {
         this.dataSource = dataSource;

@@ -1,14 +1,14 @@
-package manager;
+package com.codecool.dungeoncrawl.manager.DAOs;
 
-public class EnemyDAO {
+public class PlayerDAO {
     private int id;
-    private String type;
+    private String name;
     private int posX;
     private int posY;
     private int gameID;
 
-    public EnemyDAO(String type, int posX, int posY, int gameID) {
-        this.type = type;
+    public PlayerDAO(String name, int posX, int posY, int gameID) {
+        this.name = name;
         this.posX = posX;
         this.posY = posY;
         this.gameID = gameID;
@@ -22,12 +22,12 @@ public class EnemyDAO {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getPosX() {

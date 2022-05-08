@@ -1,4 +1,4 @@
-package manager;
+package com.codecool.dungeoncrawl.manager;
 
 import org.postgresql.ds.PGSimpleDataSource;
 

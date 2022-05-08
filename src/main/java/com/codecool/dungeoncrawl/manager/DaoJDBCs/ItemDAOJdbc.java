@@ -1,4 +1,6 @@
-package manager;
+package com.codecool.dungeoncrawl.manager.DaoJDBCs;
+
+import com.codecool.dungeoncrawl.manager.DAOs.ItemDAO;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -6,7 +8,7 @@ import java.util.ArrayList;
 
 public class ItemDAOJdbc {
 
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     public ItemDAOJdbc(DataSource dataSource) {
         this.dataSource = dataSource;

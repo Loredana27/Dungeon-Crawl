@@ -1,13 +1,14 @@
-package manager;
+package com.codecool.dungeoncrawl.manager.DAOs;
 
-public class ItemDAO {
+public class AvailableItemDAO {
     private int id;
     private String type;
     private int posX;
     private int posY;
+
     private int gameID;
 
-    public ItemDAO(String type, int posX, int posY, int gameID) {
+    public AvailableItemDAO(String type, int posX, int posY, int gameID) {
         this.type = type;
         this.posX = posX;
         this.posY = posY;

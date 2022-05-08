@@ -1,8 +1,4 @@
-package manager;
-
-import com.codecool.dungeoncrawl.logic.actors.Player;
-import com.codecool.dungeoncrawl.logic.actors.enemies.Enemy;
-import com.codecool.dungeoncrawl.logic.actors.items.Item;
+package com.codecool.dungeoncrawl.manager.DAOs;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,7 +8,7 @@ public class GameDAO {
     private String name;
     private int actualMap;
 
-    private Date savedata;
+    private Date saveDate;
     private PlayerDAO player;
     private ArrayList<EnemyDAO> enemies;
     private ArrayList<ItemDAO> items;
@@ -83,11 +79,11 @@ public class GameDAO {
         this.availableItems = availableItems;
     }
 
-    public Date getSavedata() {
-        return savedata;
+    public Date getSaveDate() {
+        return saveDate;
     }
 
-    public void setSavedata(Date savedata) {
-        this.savedata = savedata;
+    public void setSaveDate(Date saveDate) {
+        this.saveDate = saveDate;
     }
 }

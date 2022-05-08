@@ -1,24 +1,21 @@
-package manager;
+package com.codecool.dungeoncrawl.manager.DaoJDBCs;
 
-import com.codecool.dungeoncrawl.logic.actors.Player;
-import com.codecool.dungeoncrawl.logic.actors.enemies.Enemy;
-import com.codecool.dungeoncrawl.logic.actors.items.Item;
+import com.codecool.dungeoncrawl.manager.DAOs.*;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.zip.DataFormatException;
 
 public class GameDAOJdbc {
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    private EnemyDAOJdbc enemyDAOJdbc;
+    private final EnemyDAOJdbc enemyDAOJdbc;
 
-    private PlayerDAOJdbc playerDAOJdbc;
+    private final PlayerDAOJdbc playerDAOJdbc;
 
-    private ItemDAOJdbc itemDAOJdbc;
+    private final ItemDAOJdbc itemDAOJdbc;
 
-    private AvailableItemDAOJdbc availableItemDAOJdbc;
+    private final AvailableItemDAOJdbc availableItemDAOJdbc;
 
     public GameDAOJdbc(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -39,18 +36,8 @@ public class GameDAOJdbc {
             ResultSet rs = st.getGeneratedKeys();
             rs.next();
             game.setId(rs.getInt(1));
-            game.getEnemies().forEach(e -> {
-                enemyDAOJdbc.insertEnemy(new EnemyDAO(e.getType(), e.getPosX(), e.getPosY(), game.getId()));
-            });
-            game.getAvailableItems().forEach(e ->{
-                availableItemDAOJdbc.insertAvailableItem(new AvailableItemDAO(e.getType(), e.getPosX(),e.getPosY(), game.getId()));
-            });
-            game.getItems().forEach(e->{
-                itemDAOJdbc.insertItem(new ItemDAO(e.getType(), e.getPosX(), e.getPosY(), game.getId()));
-            });
-            PlayerDAO player = game.getPlayer();
-            playerDAOJdbc.insertPlayer(new PlayerDAO(player.getName(), player.getPosX(), player.getPosY(), game.getId()));
-    }catch (SQLException e){throw new RuntimeException("Error while adding new game!!!", e);}}
+            insertGameDetails(game);
+        }catch (SQLException e){throw new RuntimeException("Error while adding new game!!!", e);}}
 
     public void updateGame(GameDAO game){
         try (Connection conn = dataSource.getConnection()){
@@ -68,18 +55,16 @@ public class GameDAOJdbc {
             st.executeUpdate();
 
 
-            game.getEnemies().forEach(e -> {
-                enemyDAOJdbc.insertEnemy(new EnemyDAO(e.getType(), e.getPosX(), e.getPosY(), game.getId()));
-            });
-            game.getAvailableItems().forEach(e ->{
-                availableItemDAOJdbc.insertAvailableItem(new AvailableItemDAO(e.getType(), e.getPosX(),e.getPosY(), game.getId()));
-            });
-            game.getItems().forEach(e->{
-                itemDAOJdbc.insertItem(new ItemDAO(e.getType(), e.getPosX(), e.getPosY(), game.getId()));
-            });
-            PlayerDAO player = game.getPlayer();
-            playerDAOJdbc.insertPlayer(new PlayerDAO(player.getName(), player.getPosX(), player.getPosY(), game.getId()));
+            insertGameDetails(game);
         }catch (SQLException e){throw new RuntimeException("Error while updating game!!! ", e);}
+    }
+
+    private void insertGameDetails(GameDAO game) {
+        game.getEnemies().forEach(e -> enemyDAOJdbc.insertEnemy(new EnemyDAO(e.getType(), e.getPosX(), e.getPosY(), game.getId())));
+        game.getAvailableItems().forEach(e ->availableItemDAOJdbc.insertAvailableItem(new AvailableItemDAO(e.getType(), e.getPosX(),e.getPosY(), game.getId())));
+        game.getItems().forEach(e->itemDAOJdbc.insertItem(new ItemDAO(e.getType(), e.getPosX(), e.getPosY(), game.getId())));
+        PlayerDAO player = game.getPlayer();
+        playerDAOJdbc.insertPlayer(new PlayerDAO(player.getName(), player.getPosX(), player.getPosY(), game.getId()));
     }
 
     public void deleteGame(int id){
@@ -98,8 +83,8 @@ public class GameDAOJdbc {
 
         }catch (SQLException e){
             throw new RuntimeException("Error while deleting game!!!",e);
-
-    }}
+        }
+    }
 
     public GameDAO getGame(int id){
         try (Connection conn = dataSource.getConnection()) {
@@ -112,7 +97,7 @@ public class GameDAOJdbc {
             }
             GameDAO game = new GameDAO(rs.getNString("name"), rs.getInt(2), playerDAOJdbc.getPlayer(id), enemyDAOJdbc.getAllEnemy(id), itemDAOJdbc.getAllItems(id), availableItemDAOJdbc.getAllAvailableItems(id));
             game.setId(id);
-            game.setSavedata(rs.getDate(3));
+            game.setSaveDate(rs.getDate(3));
             return game;
 
         } catch (SQLException e) {
@@ -128,7 +113,7 @@ public class GameDAOJdbc {
             while (rs.next()) {
                 GameDAO gameDAO = new GameDAO(rs.getNString("name"), rs.getInt(2),playerDAOJdbc.getPlayer(rs.getInt(1)), enemyDAOJdbc.getAllEnemy(rs.getInt(1)), itemDAOJdbc.getAllItems(rs.getInt(1)),availableItemDAOJdbc.getAllAvailableItems(rs.getInt(1)));
                 gameDAO.setId(gameDAO.getId());
-                gameDAO.setSavedata(rs.getDate(3));
+                gameDAO.setSaveDate(rs.getDate(3));
                 gameDAOs.add(gameDAO);
             }
             return gameDAOs;
