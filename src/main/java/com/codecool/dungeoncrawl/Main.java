@@ -105,6 +105,7 @@ public class Main extends Application {
         inventory.getChildren().clear();
         itemsToCollect.getChildren().clear();
         Button startGameButton = new Button("Start Game");
+        startGameButton.getStyleClass().add("startButton");
         startGameButton.setOnAction(MouseEvent -> {
             map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
             canvas = new Canvas(
@@ -478,6 +479,7 @@ public class Main extends Application {
                 e.printStackTrace();
             }
         } else if (result.isPresent() && result.get() == buttonNo) {
+            ui = null;
             startApplicationState();
         }
     }
