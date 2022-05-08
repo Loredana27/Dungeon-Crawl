@@ -15,6 +15,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -22,6 +23,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
@@ -30,6 +32,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
+    Screen screen;
     Stage mainStage;
     Scene scene;
     BorderPane borderPane;
@@ -66,6 +69,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage){
         try{
+            screen = Screen.getPrimary();
+
             mainStage = primaryStage;
 
 
@@ -81,12 +86,7 @@ public class Main extends Application {
             uiContainer.setFocusTraversable(true);
             scene.addEventHandler(KeyEvent.KEY_PRESSED, this::onKeyPressed);
 
-            mainStage.setHeight(708.7999877929688);
-            mainStage.setWidth(1014.4000244140625);
             showMainStage();
-            System.out.println(mainStage.getHeight());
-            System.out.println(mainStage.getWidth());
-
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -95,7 +95,7 @@ public class Main extends Application {
     public void startApplicationState(){
         initStartApplicationstateUI();
         borderPane.setTop(initMenuBar());
-        borderPane.setCenter(new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("/icon.png")).toExternalForm())));
+        borderPane.setCenter(new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("/main.png")).toExternalForm())));
         borderPane.setRight(uiContainer);
     }
 
@@ -113,13 +113,17 @@ public class Main extends Application {
                     map.getHeight() * Tiles.TILE_WIDTH);
             context = canvas.getGraphicsContext2D();
             getPlayerName();
-            initUI();
-            restartGame();
-            uiContainer.setFocusTraversable(true);
-            canvas.setFocusTraversable(true);
-            borderPane.setCenter(canvas);
+            if(nameLabel.getText().equals("")){
+                startApplicationState();
+            }else {
+                initUI();
+                restartGame();
+                uiContainer.setFocusTraversable(true);
+                canvas.setFocusTraversable(true);
+                borderPane.setCenter(canvas);
 
-            refresh();
+                refresh();
+            }
 
         });
         uiDetails.add(startGameButton,1,0);
@@ -134,6 +138,8 @@ public class Main extends Application {
         mainStage.setTitle("Dungeon Crawl By L.A");
         mainStage.setResizable(false);
         mainStage.show();
+        mainStage.setX(getScreenWidth()/2 - mainStage.getWidth()/2);
+        mainStage.setY(getScreenHeight()/2 - mainStage.getHeight()/2);
     }
 
 
@@ -228,6 +234,13 @@ public class Main extends Application {
             if (map.getDoor() != null) if (map.getPlayer().getCell().equals(map.getDoor().getCell())) nextLevel();
             checkForEnd();
         }
+        else if(keyEvent.getCode().equals(KeyCode.H)){
+            showControlsDialog();
+        } else if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+            getPlayerName();
+            if(nameLabel.getText().equals("")) startApplicationState();
+            else restartGame();
+        }
     }
 
 
@@ -248,14 +261,13 @@ public class Main extends Application {
         inputDialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
         Optional<String> result = inputDialog.showAndWait();
         if(result.isPresent() && !result.get().equals("")){
+            System.out.println("something");
             try {
                 nameLabel.setText(inputDialog.getEditor().getText());
                 map.getPlayer().setName(inputDialog.getEditor().getText());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            System.exit(0);
         }
 //        refresh();
     }
@@ -304,7 +316,8 @@ public class Main extends Application {
         MenuItem exit = new MenuItem("Exit");
         newGame.setOnAction(e->{
             getPlayerName();
-            restartGame();
+            if(nameLabel.getText().equals("")) startApplicationState();
+            else restartGame();
         });
         exit.setOnAction(e-> System.exit(0));
 
@@ -470,18 +483,26 @@ public class Main extends Application {
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/gameOver.css")).toExternalForm());
         dialogPane.getStyleClass().add("gameOverPane");
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == buttonYes){
-            try {
-                restartGame();
-            } catch (Exception e) {
+
+        alert.show();
+
+        alert.setX(getScreenWidth()/2 - alert.getWidth()/2);
+        alert.setY(getScreenHeight()/2 - alert.getHeight()/2);
+
+        alert.setOnHiding((event)->{
+            Optional<ButtonType> result = Optional.ofNullable(alert.getResult());
+            if(result.isPresent() && result.get() == buttonYes){
+                try {
+                    restartGame();
+                } catch (Exception e) {
 //                throw new RuntimeException(e);
-                e.printStackTrace();
+                    e.printStackTrace();
+                }
+            } else if (result.isPresent() && result.get() == buttonNo) {
+                ui = null;
+                startApplicationState();
             }
-        } else if (result.isPresent() && result.get() == buttonNo) {
-            ui = null;
-            startApplicationState();
-        }
+        });
     }
 
 
@@ -502,16 +523,27 @@ public class Main extends Application {
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/youWon.css")).toExternalForm());
         dialogPane.getStyleClass().add("youWonPane");
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == buttonYes){
-            try {
-                restartGame();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (result.isPresent() && result.get() == buttonNo) {
-            startApplicationState();
-        }
+
+
+
+            alert.show();
+
+            alert.setX(getScreenWidth()/2 - alert.getWidth()/2);
+            alert.setY(getScreenHeight()/2 - alert.getHeight()/2);
+
+            alert.setOnHiding(event -> {
+                Optional<ButtonType> result = Optional.ofNullable(alert.getResult());
+                if(result.isPresent() && result.get() == buttonYes){
+                    try {
+                        restartGame();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (result.isPresent() && result.get() == buttonNo) {
+                    startApplicationState();
+                }
+            });
+
     }
 
 
@@ -560,7 +592,11 @@ public class Main extends Application {
         ButtonType buttonTypeOK = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
         alert.getButtonTypes().add(buttonTypeOK);
 
-        alert.showAndWait();
+
+        alert.show();
+
+        alert.setX(getScreenWidth()/2 - alert.getWidth()/2);
+        alert.setY(getScreenHeight()/2 - alert.getHeight()/2);
     }
 
     public void showAboutDialog(){
@@ -578,6 +614,17 @@ public class Main extends Application {
         Button closeButton = (Button) alert.getDialogPane().lookupButton(buttonTypeOK);
         closeButton.setAlignment(Pos.CENTER);
 
-        alert.showAndWait();
+        alert.show();
+        alert.setX(getScreenWidth()/2 - alert.getWidth()/2);
+        alert.setY(getScreenHeight()/2 - alert.getHeight()/2);
     }
+
+    private double getScreenWidth(){
+        return screen.getVisualBounds().getWidth();
+    }
+
+    private double getScreenHeight(){
+        return screen.getVisualBounds().getHeight();
+    }
+
 }
