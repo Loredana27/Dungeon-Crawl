@@ -318,7 +318,14 @@ public class Main extends Application {
             if(nameLabel.getText().equals("")) startApplicationState();
             else restartGame();
         });
+
+        saveGameDB.setOnAction(e-> saveDatabaseGame());
+        saveGameFile.setOnAction(e-> saveFileGame());
+        loadDBGame.setOnAction(e-> loadDatabaseGame());
+        loadFileGame.setOnAction(e-> loadFileGame());
+
         exit.setOnAction(e-> System.exit(0));
+
 
         gameMenu.getItems().add(newGame);
         gameMenu.getItems().add(saveGameDB);
@@ -623,7 +630,7 @@ public class Main extends Application {
 
     }
 
-    private void loadDatabaseGame(int gameId){
+    private void loadDatabaseGame(){
 
     }
 
@@ -631,7 +638,7 @@ public class Main extends Application {
 
     }
 
-    private void loadFileGame(String path){
+    private void loadFileGame(){
 
     }
 
