@@ -7,11 +7,11 @@ import java.sql.SQLException;
 
 public class DungeonCrawlDatabaseManager {
 
-    private DataSource connect() throws SQLException {
+    public DataSource connect() throws SQLException {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
-        dataSource.setDatabaseName("books");
-        dataSource.setUser("wojtechm");
-        dataSource.setPassword("admin");
+        dataSource.setDatabaseName(System.getenv("PSQL_DATABASE"));
+        dataSource.setUser(System.getenv("PSQL_USERNAME"));
+        dataSource.setPassword(System.getenv("PSQL_PASSWORD"));
 
         System.out.println("Trying to connect...");
         dataSource.getConnection().close();

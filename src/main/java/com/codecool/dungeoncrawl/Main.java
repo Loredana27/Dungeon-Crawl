@@ -7,6 +7,7 @@ import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
 import com.codecool.dungeoncrawl.manager.DAOs.*;
 import com.codecool.dungeoncrawl.manager.DaoJDBCs.GameDAOJdbc;
+import com.codecool.dungeoncrawl.manager.DungeonCrawlDatabaseManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,6 +29,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -656,6 +658,8 @@ public class Main extends Application {
                     availableItemDAOs
 
             );
+        if (gameDAOJdbc == null) initGameJdbc();
+        gameDAOJdbc.insertGame(gameDAO);
         }
 
     }
@@ -689,6 +693,7 @@ public class Main extends Application {
 
     private void loadDatabaseGame(){
 
+
     }
 
     private void saveFileGame(){
@@ -705,6 +710,16 @@ public class Main extends Application {
 
     private double getScreenHeight(){
         return screen.getVisualBounds().getHeight();
+    }
+
+
+    private void initGameJdbc(){
+        DungeonCrawlDatabaseManager db =  new DungeonCrawlDatabaseManager();
+        try {
+            gameDAOJdbc = new GameDAOJdbc(db.connect());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
