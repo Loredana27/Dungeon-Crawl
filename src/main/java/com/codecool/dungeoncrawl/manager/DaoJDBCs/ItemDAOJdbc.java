@@ -65,7 +65,7 @@ public class ItemDAOJdbc {
             ResultSet rs = st.executeQuery();
             ArrayList<ItemDAO> itemDAOs= new ArrayList<>();
             while (rs.next()) {
-                ItemDAO itemDAO = new ItemDAO(rs.getNString("type"), rs.getInt(2),rs.getInt(3) , gameID);
+                ItemDAO itemDAO = new ItemDAO(rs.getNString("type"));
                 itemDAO.setId(itemDAO.getId());
                 itemDAOs.add(itemDAO);
             }

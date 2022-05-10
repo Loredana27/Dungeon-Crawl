@@ -8,11 +8,10 @@ public class AvailableItemDAO {
 
     private int gameID;
 
-    public AvailableItemDAO(String type, int posX, int posY, int gameID) {
+    public AvailableItemDAO(String type, int posX, int posY) {
         this.type = type;
         this.posX = posX;
         this.posY = posY;
-        this.gameID = gameID;
     }
 
     public int getId() {

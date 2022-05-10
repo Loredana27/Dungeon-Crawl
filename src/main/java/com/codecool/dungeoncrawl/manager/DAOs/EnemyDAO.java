@@ -7,11 +7,11 @@ public class EnemyDAO {
     private int posY;
     private int gameID;
 
-    public EnemyDAO(String type, int posX, int posY, int gameID) {
+    public EnemyDAO(String type, int posX, int posY) {
         this.type = type;
         this.posX = posX;
         this.posY = posY;
-        this.gameID = gameID;
+
     }
 
     public int getId() {

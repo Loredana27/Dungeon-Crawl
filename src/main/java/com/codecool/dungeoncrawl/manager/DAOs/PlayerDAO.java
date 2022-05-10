@@ -7,11 +7,10 @@ public class PlayerDAO {
     private int posY;
     private int gameID;
 
-    public PlayerDAO(String name, int posX, int posY, int gameID) {
+    public PlayerDAO(String name, int posX, int posY) {
         this.name = name;
         this.posX = posX;
         this.posY = posY;
-        this.gameID = gameID;
     }
 
     public int getId() {

@@ -3,6 +3,9 @@ package com.codecool.dungeoncrawl.logic;
 import com.codecool.dungeoncrawl.logic.actors.Door;
 import com.codecool.dungeoncrawl.logic.actors.enemies.Enemy;
 import com.codecool.dungeoncrawl.logic.actors.Player;
+import com.codecool.dungeoncrawl.logic.actors.items.Item;
+import com.codecool.dungeoncrawl.manager.DAOs.AvailableItemDAO;
+import com.codecool.dungeoncrawl.manager.DAOs.ItemDAO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +14,8 @@ public class GameMap {
     private int width;
     private int height;
     private Cell[][] cells;
+
+    private ArrayList<AvailableItemDAO> availableItemDAOS;
 
     private HashMap<String,Integer> availableItems;
 
@@ -177,5 +182,17 @@ public class GameMap {
 
     public void setPortalB(Cell portalB) {
         this.portalB = portalB;
+    }
+
+    public ArrayList<AvailableItemDAO> getAllAvailableItems(){
+        availableItemDAOS = new ArrayList<>();
+        for(int i=0; i<cells.length; i++){
+            for (int j=0; j<cells[i].length; j++){
+                if(cells[i][j].getActor() instanceof Item){
+                    availableItemDAOS.add(new AvailableItemDAO(cells[i][j].getActor().getTileName(), cells[i][j].getX(), cells[i][j].getY()));
+                }
+            }
+        }
+        return availableItemDAOS;
     }
 }

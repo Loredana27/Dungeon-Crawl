@@ -63,7 +63,7 @@ public class AvailableItemDAOJdbc {
             ResultSet rs = st.executeQuery();
             ArrayList<AvailableItemDAO> availableItemDAOs= new ArrayList<>();
             while (rs.next()) {
-                AvailableItemDAO availableItem = new AvailableItemDAO(rs.getNString("type"), rs.getInt(2),rs.getInt(3) , gameID);
+                AvailableItemDAO availableItem = new AvailableItemDAO(rs.getNString("type"), rs.getInt(2),rs.getInt(3));
                 availableItem.setId(availableItem.getId());
                 availableItemDAOs.add(availableItem);
             }

@@ -60,11 +60,21 @@ public class GameDAOJdbc {
     }
 
     private void insertGameDetails(GameDAO game) {
-        game.getEnemies().forEach(e -> enemyDAOJdbc.insertEnemy(new EnemyDAO(e.getType(), e.getPosX(), e.getPosY(), game.getId())));
-        game.getAvailableItems().forEach(e ->availableItemDAOJdbc.insertAvailableItem(new AvailableItemDAO(e.getType(), e.getPosX(),e.getPosY(), game.getId())));
-        game.getItems().forEach(e->itemDAOJdbc.insertItem(new ItemDAO(e.getType(), e.getPosX(), e.getPosY(), game.getId())));
+        game.getEnemies().forEach(e -> {
+            e.setGameID(game.getId());
+            enemyDAOJdbc.insertEnemy(e);
+        });
+        game.getAvailableItems().forEach(e -> {
+            e.setGameID(game.getId());
+            availableItemDAOJdbc.insertAvailableItem(e);
+        });
+        game.getItems().forEach(e-> {
+            e.setGameID(game.getId());
+            itemDAOJdbc.insertItem(e);
+        });
         PlayerDAO player = game.getPlayer();
-        playerDAOJdbc.insertPlayer(new PlayerDAO(player.getName(), player.getPosX(), player.getPosY(), game.getId()));
+        player.setGameID(game.getId());
+        playerDAOJdbc.insertPlayer(player);
     }
 
     public void deleteGame(int id){

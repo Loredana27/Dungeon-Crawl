@@ -5,6 +5,8 @@ import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
+import com.codecool.dungeoncrawl.manager.DAOs.*;
+import com.codecool.dungeoncrawl.manager.DaoJDBCs.GameDAOJdbc;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -26,12 +28,21 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
+
+    PlayerDAO playerDAO;
+    EnemyDAO enemyDAO;
+    ItemDAO itemDAO;
+    AvailableItemDAO availableItemDAO;
+
+    GameDAO gameDAO;
+    GameDAOJdbc gameDAOJdbc;
     Screen screen;
     Stage mainStage;
     Scene scene;
@@ -627,7 +638,53 @@ public class Main extends Application {
     }
 
     private void saveDatabaseGame(){
+        String saveName = getName();
+        if (saveName != null){
+            ArrayList<AvailableItemDAO> availableItemDAOs = map.getAllAvailableItems();
+            ArrayList<ItemDAO> itemDAOs = map.getPlayer().getAllItems();
+            ArrayList<EnemyDAO> enemyDAOs = new ArrayList<>();
+            playerDAO = new PlayerDAO(nameLabel.getText(), map.getPlayer().getX(), map.getPlayer().getY());
+            map.getPlayer().getEnemies().forEach(enemy -> {
+                enemyDAOs.add(new EnemyDAO(enemy.getTileName(), enemy.getX(), enemy.getY()));
+            });
+            gameDAO = new GameDAO(
+                    saveName,
+                    actualMap,
+                    playerDAO,
+                    enemyDAOs,
+                    itemDAOs,
+                    availableItemDAOs
 
+            );
+        }
+
+    }
+
+    private String getName(){
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.initOwner(mainStage);
+        inputDialog.setGraphic(null);
+        inputDialog.setTitle("Game name needed!");
+        inputDialog.setHeaderText(null);
+        inputDialog.setContentText("Please insert your game: ");
+        inputDialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/getName.css")).toExternalForm());
+        inputDialog.getDialogPane().getStyleClass().add("getInputPane");
+        inputDialog.getEditor().getStyleClass().add("textInput");
+        inputDialog.getDialogPane().getButtonTypes().clear();
+        ButtonType buttonTypeOK = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        inputDialog.getDialogPane().getButtonTypes().add(buttonTypeOK);
+        inputDialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+        Optional<String> result = inputDialog.showAndWait();
+        if(result.isPresent() && !result.get().equals("")){
+            try {
+                return inputDialog.getEditor().getText();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        return null;
     }
 
     private void loadDatabaseGame(){
