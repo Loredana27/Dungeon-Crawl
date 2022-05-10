@@ -1,5 +1,6 @@
 package com.codecool.dungeoncrawl.logic;
 
+import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Door;
 import com.codecool.dungeoncrawl.logic.actors.enemies.Enemy;
 import com.codecool.dungeoncrawl.logic.actors.Player;
@@ -194,5 +195,23 @@ public class GameMap {
             }
         }
         return availableItemDAOS;
+    }
+
+    public void setActorOnPosition(Actor actor, int x, int y){
+        cells[x][y].setActor(actor);
+    }
+
+    public void cleanActors(){
+        for(int i =0; i<cells.length; i++){
+            for(int j = 0; j<cells[i].length; j++){
+//                if(cells[i][j].getActor() != null){
+                    cells[i][j].setActor(null);
+//                }
+
+            }
+        }
+         player = null;
+        availableItems.clear();
+        gameAI.clear();
     }
 }

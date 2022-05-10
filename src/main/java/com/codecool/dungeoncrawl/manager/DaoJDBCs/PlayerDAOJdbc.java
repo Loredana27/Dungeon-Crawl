@@ -62,7 +62,7 @@ public class PlayerDAOJdbc {
             if (!rs.next()) {
                 return null;
             }
-            PlayerDAO player = new PlayerDAO(rs.getNString("name"), rs.getInt(2),rs.getInt(3));
+            PlayerDAO player = new PlayerDAO(rs.getString(1), rs.getInt(2),rs.getInt(3));
             player.setId(player.getId());
             return player;
 

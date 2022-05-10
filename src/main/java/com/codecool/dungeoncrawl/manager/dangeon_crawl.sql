@@ -44,8 +44,6 @@ create table if not exists item
         constraint item_pk
             primary key,
     type    text,
-    posX integer not null,
-    posY  integer not null,
     game_id integer
         constraint item_game_id_fk
             references game

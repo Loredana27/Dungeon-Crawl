@@ -5,6 +5,9 @@ import com.codecool.dungeoncrawl.logic.CellType;
 import com.codecool.dungeoncrawl.logic.GameMap;
 import com.codecool.dungeoncrawl.logic.MapLoader;
 import com.codecool.dungeoncrawl.logic.actors.OpenedDoor;
+import com.codecool.dungeoncrawl.logic.actors.Player;
+import com.codecool.dungeoncrawl.logic.actors.enemies.*;
+import com.codecool.dungeoncrawl.logic.actors.items.*;
 import com.codecool.dungeoncrawl.manager.DAOs.*;
 import com.codecool.dungeoncrawl.manager.DaoJDBCs.GameDAOJdbc;
 import com.codecool.dungeoncrawl.manager.DungeonCrawlDatabaseManager;
@@ -334,7 +337,7 @@ public class Main extends Application {
 
         saveGameDB.setOnAction(e-> saveDatabaseGame());
         saveGameFile.setOnAction(e-> saveFileGame());
-        loadDBGame.setOnAction(e-> loadDatabaseGame());
+        loadDBGame.setOnAction(e-> loadDatabaseGame(3));
         loadFileGame.setOnAction(e-> loadFileGame());
 
         exit.setOnAction(e-> System.exit(0));
@@ -646,7 +649,7 @@ public class Main extends Application {
             ArrayList<ItemDAO> itemDAOs = map.getPlayer().getAllItems();
             ArrayList<EnemyDAO> enemyDAOs = new ArrayList<>();
             playerDAO = new PlayerDAO(nameLabel.getText(), map.getPlayer().getX(), map.getPlayer().getY());
-            map.getPlayer().getEnemies().forEach(enemy ->
+            map.getGameAI().forEach(enemy ->
                     enemyDAOs.add(new EnemyDAO(enemy.getTileName(), enemy.getX(), enemy.getY()))
             );
             gameDAO = new GameDAO(
@@ -690,8 +693,121 @@ public class Main extends Application {
         return null;
     }
 
-    private void loadDatabaseGame(){
+    private void loadDatabaseGame(int id){
+        if (gameDAOJdbc == null) initGameJdbc();
+        gameDAO = gameDAOJdbc.getGame(id);
+        initUI();
+        switch (gameDAO.getActualMap()){
+            case 1:
+                map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
+                break;
+            case 2:
+                map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(secondMap));
+                break;
+            case 3:
+                map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
+                break;
+        }
+        canvas = new Canvas(
+                map.getWidth() * Tiles.TILE_WIDTH,
+                map.getHeight() * Tiles.TILE_WIDTH);
+        context = canvas.getGraphicsContext2D();
 
+        uiContainer.setFocusTraversable(true);
+        canvas.setFocusTraversable(true);
+        borderPane.setCenter(canvas);
+
+        map.cleanActors();
+        Player player = new Player(map.getCell(gameDAO.getPlayer().getPosX(), gameDAO.getPlayer().getPosY()));
+        player.setName(gameDAO.getPlayer().getName());
+        nameLabel.setText(player.getName());
+        map.setPlayer(player);
+        gameDAO.getAvailableItems().forEach(e -> {
+            Cell cell = map.getCell(e.getPosX(), e.getPosY());
+            switch (e.getType()){
+                case "heal":
+                    HealPotion heal = new HealPotion(cell);
+                    cell.setActor(heal);
+                    map.addItem(heal.getTileName());
+                    break;
+                case "key":
+                    Key key = new Key(cell);
+                    cell.setActor(key);
+                    map.addItem(key.getTileName());
+                    break;
+                case "sword":
+                    Sword sword = new Sword(cell);
+                    cell.setActor(sword);
+                    map.addItem(sword.getTileName());
+                    break;
+                case "treasure":
+                    Treasure treasure = new Treasure(cell);
+                    cell.setActor(treasure);
+                    map.addItem(treasure.getTileName());
+                    break;
+                case "treasure key":
+                    TreasureKey tresureKey = new TreasureKey(cell);
+                    cell.setActor(tresureKey);
+                    map.addItem(tresureKey.getTileName() );
+                    break;
+                }
+        });
+        gameDAO.getItems().forEach(e->{
+            Cell cell = map.getCell(map.getPlayer().getX(), map.getPlayer().getY());
+            switch (e.getType()){
+                case "heal":
+                   cell.setTempItem(new HealPotion(cell));
+
+                    break;
+                case "key":
+                    cell.setTempItem(new Key(cell));
+                    break;
+                case "sword":
+                    cell.setTempItem(new Sword(cell));
+                    break;
+                case "treasure":
+                    cell.setTempItem(new Treasure(cell));
+                    map.getPlayer().addItem("treasure key");
+                    break;
+                case "treasure key":
+                    cell.setTempItem(new TreasureKey(cell));
+                    break;
+            }
+            map.getPlayer().pickupItem();
+        });
+
+        gameDAO.getEnemies().forEach(e -> {
+            Cell cell = map.getCell(e.getPosX(),e.getPosY() );
+            switch (e.getType()){
+                case "skeleton":
+                    Skeleton skeleton = new Skeleton(cell);
+                    cell.setActor(skeleton);
+                    map.addAI(skeleton);
+                    break;
+                case "farmer":
+                    Farmer farmer = new Farmer(cell);
+                    cell.setActor(farmer);
+                    map.addAI(farmer);
+                    break;
+                case "soldier":
+                    Soldier soldier = new Soldier(cell);
+                    cell.setActor(soldier);
+                    map.addAI(soldier);
+                    break;
+                case "bear":
+                    Bear bear = new Bear(cell);
+                    cell.setActor(bear);
+                    map.addAI(bear);
+                    break;
+                case "bat":
+                    Bat bat = new Bat(cell);
+                    cell.setActor(bat);
+                    map.addAI(bat);
+                    break;
+            }
+        });
+
+        refresh();
 
     }
 

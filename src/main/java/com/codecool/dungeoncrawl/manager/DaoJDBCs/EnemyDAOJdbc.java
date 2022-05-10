@@ -65,7 +65,7 @@ public class EnemyDAOJdbc {
             ResultSet rs = st.executeQuery();
             ArrayList<EnemyDAO> enemyDAOs= new ArrayList<>();
             while (rs.next()) {
-                EnemyDAO enemyDAO = new EnemyDAO(rs.getNString("type"), rs.getInt(2),rs.getInt(3));
+                EnemyDAO enemyDAO = new EnemyDAO(rs.getString(1), rs.getInt(2),rs.getInt(3));
                 enemyDAO.setId(enemyDAO.getId());
                 enemyDAOs.add(enemyDAO);
             }

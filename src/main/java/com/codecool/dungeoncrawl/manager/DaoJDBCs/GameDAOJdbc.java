@@ -105,13 +105,15 @@ public class GameDAOJdbc {
             if (!rs.next()) {
                 return null;
             }
-            GameDAO game = new GameDAO(rs.getNString("name"), rs.getInt(2), playerDAOJdbc.getPlayer(id), enemyDAOJdbc.getAllEnemy(id), itemDAOJdbc.getAllItems(id), availableItemDAOJdbc.getAllAvailableItems(id));
+            GameDAO game = new GameDAO(rs.getString(1), rs.getInt(2), playerDAOJdbc.getPlayer(id), enemyDAOJdbc.getAllEnemy(id), itemDAOJdbc.getAllItems(id), availableItemDAOJdbc.getAllAvailableItems(id));
             game.setId(id);
             game.setSaveDate(rs.getDate(3));
             return game;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error!!!" , e);
+            e.printStackTrace();
+            return null;
+//            throw new RuntimeException("Error!!!" , e);
         }
     }
 

@@ -24,6 +24,7 @@ public class AvailableItemDAOJdbc {
             st.setInt(4,availableItem.getGameID());
             st.executeUpdate();
             ResultSet rs = st.getGeneratedKeys();
+            rs.next();
             availableItem.setId(rs.getInt(1));
         }catch (SQLException e){ throw new RuntimeException("Error while adding new available Item!!", e);
 
@@ -63,7 +64,7 @@ public class AvailableItemDAOJdbc {
             ResultSet rs = st.executeQuery();
             ArrayList<AvailableItemDAO> availableItemDAOs= new ArrayList<>();
             while (rs.next()) {
-                AvailableItemDAO availableItem = new AvailableItemDAO(rs.getNString("type"), rs.getInt(2),rs.getInt(3));
+                AvailableItemDAO availableItem = new AvailableItemDAO(rs.getString(1), rs.getInt(2),rs.getInt(3));
                 availableItem.setId(availableItem.getId());
                 availableItemDAOs.add(availableItem);
             }

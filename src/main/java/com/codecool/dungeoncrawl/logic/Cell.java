@@ -8,6 +8,11 @@ public class Cell implements Drawable {
     private Actor actor;
 
     private Item tempItem;
+
+    public void setTempItem(Item tempItem) {
+        this.tempItem = tempItem;
+    }
+
     private GameMap gameMap;
     private int x, y;
 
