@@ -28,6 +28,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.postgresql.ds.PGSimpleDataSource;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -119,29 +120,30 @@ public class Main extends Application {
         itemsToCollect.getChildren().clear();
         Button startGameButton = new Button("Start Game");
         startGameButton.getStyleClass().add("startButton");
-        startGameButton.setOnAction(MouseEvent -> {
-            map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
-            canvas = new Canvas(
-                    map.getWidth() * Tiles.TILE_WIDTH,
-                    map.getHeight() * Tiles.TILE_WIDTH);
-            context = canvas.getGraphicsContext2D();
-            getPlayerName();
-            if(nameLabel.getText().equals("")){
-                startApplicationState();
-            }else {
-                initUI();
-                restartGame();
-                uiContainer.setFocusTraversable(true);
-                canvas.setFocusTraversable(true);
-                borderPane.setCenter(canvas);
-
-                refresh();
-            }
-
-        });
+        startGameButton.setOnAction(MouseEvent -> startGame());
         uiDetails.add(startGameButton,1,0);
         uiContainer.setTop(uiDetails);
         uiContainer.setCenter(ui);
+    }
+
+    private void startGame(){
+        map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
+        canvas = new Canvas(
+                map.getWidth() * Tiles.TILE_WIDTH,
+                map.getHeight() * Tiles.TILE_WIDTH);
+        context = canvas.getGraphicsContext2D();
+        getPlayerName();
+        if(nameLabel.getText().equals("")){
+            startApplicationState();
+        }else {
+            initUI();
+            restartGame();
+            uiContainer.setFocusTraversable(true);
+            canvas.setFocusTraversable(true);
+            borderPane.setCenter(canvas);
+
+            refresh();
+        }
     }
 
 
@@ -250,9 +252,7 @@ public class Main extends Application {
         else if(keyEvent.getCode().equals(KeyCode.H)){
             showControlsDialog();
         } else if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-            getPlayerName();
-            if(nameLabel.getText().equals("")) startApplicationState();
-            else restartGame();
+            startGame();
         }
     }
 
@@ -277,7 +277,7 @@ public class Main extends Application {
             System.out.println("something");
             try {
                 nameLabel.setText(inputDialog.getEditor().getText());
-                map.getPlayer().setName(inputDialog.getEditor().getText());
+//                map.getPlayer().setName(inputDialog.getEditor().getText());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -646,9 +646,9 @@ public class Main extends Application {
             ArrayList<ItemDAO> itemDAOs = map.getPlayer().getAllItems();
             ArrayList<EnemyDAO> enemyDAOs = new ArrayList<>();
             playerDAO = new PlayerDAO(nameLabel.getText(), map.getPlayer().getX(), map.getPlayer().getY());
-            map.getPlayer().getEnemies().forEach(enemy -> {
-                enemyDAOs.add(new EnemyDAO(enemy.getTileName(), enemy.getX(), enemy.getY()));
-            });
+            map.getPlayer().getEnemies().forEach(enemy ->
+                    enemyDAOs.add(new EnemyDAO(enemy.getTileName(), enemy.getX(), enemy.getY()))
+            );
             gameDAO = new GameDAO(
                     saveName,
                     actualMap,
@@ -656,7 +656,6 @@ public class Main extends Application {
                     enemyDAOs,
                     itemDAOs,
                     availableItemDAOs
-
             );
         if (gameDAOJdbc == null) initGameJdbc();
         gameDAOJdbc.insertGame(gameDAO);
