@@ -24,8 +24,9 @@ public class ItemDAOJdbc {
             ResultSet rs = st.getGeneratedKeys();
             rs.next();
             item.setId(rs.getInt(1));
-        }catch (SQLException e){ throw new RuntimeException("Error while adding new Item!!!", e);
-
+        }catch (SQLException e){
+//            throw new RuntimeException("Error while adding new Item!!!", e);
+                e.printStackTrace();
         }
     }
 

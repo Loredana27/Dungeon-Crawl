@@ -337,7 +337,7 @@ public class Main extends Application {
 
         saveGameDB.setOnAction(e-> saveDatabaseGame());
         saveGameFile.setOnAction(e-> saveFileGame());
-        loadDBGame.setOnAction(e-> loadDatabaseGame(3));
+        loadDBGame.setOnAction(e-> loadDatabaseGame(8));
         loadFileGame.setOnAction(e-> loadFileGame());
 
         exit.setOnAction(e-> System.exit(0));
@@ -713,15 +713,13 @@ public class Main extends Application {
                 map.getHeight() * Tiles.TILE_WIDTH);
         context = canvas.getGraphicsContext2D();
 
-        uiContainer.setFocusTraversable(true);
-        canvas.setFocusTraversable(true);
-        borderPane.setCenter(canvas);
+
 
         map.cleanActors();
         Player player = new Player(map.getCell(gameDAO.getPlayer().getPosX(), gameDAO.getPlayer().getPosY()));
-        player.setName(gameDAO.getPlayer().getName());
-        nameLabel.setText(player.getName());
         map.setPlayer(player);
+        map.getPlayer().setName(gameDAO.getPlayer().getName());
+        nameLabel.setText(map.getPlayer().getName());
         gameDAO.getAvailableItems().forEach(e -> {
             Cell cell = map.getCell(e.getPosX(), e.getPosY());
             switch (e.getType()){
@@ -752,29 +750,32 @@ public class Main extends Application {
                     break;
                 }
         });
+        player.setName("dev");
         gameDAO.getItems().forEach(e->{
             Cell cell = map.getCell(map.getPlayer().getX(), map.getPlayer().getY());
+            map.getPlayer().move(0,1);
             switch (e.getType()){
                 case "heal":
-                   cell.setTempItem(new HealPotion(cell));
-
+                   cell.setActor(new HealPotion(cell));
                     break;
                 case "key":
-                    cell.setTempItem(new Key(cell));
+                    cell.setActor(new Key(cell));
                     break;
                 case "sword":
-                    cell.setTempItem(new Sword(cell));
+                    cell.setActor(new Sword(cell));
                     break;
                 case "treasure":
-                    cell.setTempItem(new Treasure(cell));
+                    cell.setActor(new Treasure(cell));
                     map.getPlayer().addItem("treasure key");
                     break;
                 case "treasure key":
-                    cell.setTempItem(new TreasureKey(cell));
+                    cell.setActor(new TreasureKey(cell));
                     break;
             }
+            map.getPlayer().move(0,-1);
             map.getPlayer().pickupItem();
         });
+        map.getPlayer().setName(gameDAO.getPlayer().getName());
 
         gameDAO.getEnemies().forEach(e -> {
             Cell cell = map.getCell(e.getPosX(),e.getPosY() );
@@ -807,6 +808,11 @@ public class Main extends Application {
             }
         });
 
+        gameRunning = true;
+
+        uiContainer.setFocusTraversable(true);
+        canvas.setFocusTraversable(true);
+        borderPane.setCenter(canvas);
         refresh();
 
     }
