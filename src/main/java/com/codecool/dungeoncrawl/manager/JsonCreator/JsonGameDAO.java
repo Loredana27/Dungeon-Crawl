@@ -8,6 +8,8 @@ import com.codecool.dungeoncrawl.manager.DAOs.PlayerDAO;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 
@@ -66,6 +68,9 @@ public class JsonGameDAO {
             availableItemsJson.add(obj);
         });
         game.put("availableItems", availableItemsJson);
-        return game.toJSONString();
+        return game.toJSONString()
+                .replace(",",",\n")
+                .replace("{","{\n")
+                .replace("}","\n}\n");
     }
 }
