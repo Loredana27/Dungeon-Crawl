@@ -11,6 +11,8 @@ import com.codecool.dungeoncrawl.logic.actors.items.*;
 import com.codecool.dungeoncrawl.manager.DAOs.*;
 import com.codecool.dungeoncrawl.manager.DaoJDBCs.GameDAOJdbc;
 import com.codecool.dungeoncrawl.manager.DungeonCrawlDatabaseManager;
+import com.codecool.dungeoncrawl.manager.JsonCreator.JsonGameDAO;
+import com.codecool.dungeoncrawl.manager.JsonCreator.Jsonifier;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,8 +33,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.postgresql.ds.PGSimpleDataSource;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +50,7 @@ public class Main extends Application {
     AvailableItemDAO availableItemDAO;
 
     GameDAO gameDAO;
+    JsonGameDAO jsonGameDAO;
     GameDAOJdbc gameDAOJdbc;
     Screen screen;
     Stage mainStage;
@@ -645,25 +648,29 @@ public class Main extends Application {
     private void saveDatabaseGame(){
         String saveName = getName();
         if (saveName != null){
-            ArrayList<AvailableItemDAO> availableItemDAOs = map.getAllAvailableItems();
-            ArrayList<ItemDAO> itemDAOs = map.getPlayer().getAllItems();
-            ArrayList<EnemyDAO> enemyDAOs = new ArrayList<>();
-            playerDAO = new PlayerDAO(nameLabel.getText(), map.getPlayer().getX(), map.getPlayer().getY());
-            map.getGameAI().forEach(enemy ->
-                    enemyDAOs.add(new EnemyDAO(enemy.getTileName(), enemy.getX(), enemy.getY()))
-            );
-            gameDAO = new GameDAO(
-                    saveName,
-                    actualMap,
-                    playerDAO,
-                    enemyDAOs,
-                    itemDAOs,
-                    availableItemDAOs
-            );
-        if (gameDAOJdbc == null) initGameJdbc();
-        gameDAOJdbc.insertGame(gameDAO);
+            initGameDao(saveName);
+            if (gameDAOJdbc == null) initGameJdbc();
+            gameDAOJdbc.insertGame(gameDAO);
         }
 
+    }
+
+    private void initGameDao(String saveName){
+        ArrayList<AvailableItemDAO> availableItemDAOs = map.getAllAvailableItems();
+        ArrayList<ItemDAO> itemDAOs = map.getPlayer().getAllItems();
+        ArrayList<EnemyDAO> enemyDAOs = new ArrayList<>();
+        playerDAO = new PlayerDAO(nameLabel.getText(), map.getPlayer().getX(), map.getPlayer().getY());
+        map.getGameAI().forEach(enemy ->
+                enemyDAOs.add(new EnemyDAO(enemy.getTileName(), enemy.getX(), enemy.getY()))
+        );
+        gameDAO = new GameDAO(
+                saveName,
+                actualMap,
+                playerDAO,
+                enemyDAOs,
+                itemDAOs,
+                availableItemDAOs
+        );
     }
 
     private String getName(){
@@ -817,8 +824,36 @@ public class Main extends Application {
 
     }
 
-    private void saveFileGame(){
+    private void initJsonGameDao(String saveName){
+        ArrayList<AvailableItemDAO> availableItemDAOs = map.getAllAvailableItems();
+        ArrayList<ItemDAO> itemDAOs = map.getPlayer().getAllItems();
+        ArrayList<EnemyDAO> enemyDAOs = new ArrayList<>();
+        playerDAO = new PlayerDAO(nameLabel.getText(), map.getPlayer().getX(), map.getPlayer().getY());
+        map.getGameAI().forEach(enemy ->
+                enemyDAOs.add(new EnemyDAO(enemy.getTileName(), enemy.getX(), enemy.getY()))
+        );
+        jsonGameDAO = new JsonGameDAO(
+                saveName,
+                actualMap,
+                playerDAO,
+                enemyDAOs,
+                itemDAOs,
+                availableItemDAOs
+        );
+    }
 
+    private void saveFileGame(){
+        String saveName = getName();
+        if(saveName != null){
+            initGameDao(saveName);
+            try{
+                Jsonifier jsonifier = new Jsonifier(saveName);
+                initJsonGameDao(saveName);
+                jsonifier.saveGame(jsonGameDAO);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void loadFileGame(){

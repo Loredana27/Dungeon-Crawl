@@ -8,7 +8,7 @@ module com.codecool.dungeoncrawl {
     requires java.sql;
     requires org.postgresql.jdbc;
     requires java.naming;
-
+    requires json.simple;
 
     opens com.codecool.dungeoncrawl to javafx.fxml;
     exports com.codecool.dungeoncrawl;
