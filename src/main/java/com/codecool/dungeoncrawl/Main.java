@@ -567,6 +567,7 @@ public class Main extends Application {
                 }
             });
 
+
     }
 
 
@@ -649,6 +650,7 @@ public class Main extends Application {
             if (gameDAOJdbc == null) initGameJdbc();
             gameDAOJdbc.insertGame(gameDAO);
         }
+
 
     }
 
