@@ -3,8 +3,8 @@ package com.codecool.dungeoncrawl.manager.DAOs;
 public class PlayerDAO {
     private int id;
     private String name;
-    private int posX;
-    private int posY;
+    private final int posX;
+    private final int posY;
     private int gameID;
 
     public PlayerDAO(String name, int posX, int posY) {
@@ -33,16 +33,8 @@ public class PlayerDAO {
         return posX;
     }
 
-    public void setPosX(int posX) {
-        this.posX = posX;
-    }
-
     public int getPosY() {
         return posY;
-    }
-
-    public void setPosY(int posY) {
-        this.posY = posY;
     }
 
     public int getGameID() {

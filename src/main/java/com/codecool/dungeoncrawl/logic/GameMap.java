@@ -2,11 +2,10 @@ package com.codecool.dungeoncrawl.logic;
 
 import com.codecool.dungeoncrawl.logic.actors.Actor;
 import com.codecool.dungeoncrawl.logic.actors.Door;
-import com.codecool.dungeoncrawl.logic.actors.enemies.Enemy;
 import com.codecool.dungeoncrawl.logic.actors.Player;
+import com.codecool.dungeoncrawl.logic.actors.enemies.Enemy;
 import com.codecool.dungeoncrawl.logic.actors.items.Item;
 import com.codecool.dungeoncrawl.manager.DAOs.AvailableItemDAO;
-import com.codecool.dungeoncrawl.manager.DAOs.ItemDAO;
 
 import java.util.ArrayList;
 import java.util.HashMap;

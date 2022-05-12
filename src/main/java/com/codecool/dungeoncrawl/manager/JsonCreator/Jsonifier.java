@@ -1,21 +1,23 @@
 package com.codecool.dungeoncrawl.manager.JsonCreator;
 
-import com.codecool.dungeoncrawl.logic.actors.enemies.Enemy;
 import com.codecool.dungeoncrawl.manager.DAOs.*;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.sql.Date;
-import java.util.*;
-import java.io.*;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 public class Jsonifier {
 
-    private String file;
+    private final String file;
 
     public Jsonifier(String fileName) throws IOException {
         this.file = fileName;

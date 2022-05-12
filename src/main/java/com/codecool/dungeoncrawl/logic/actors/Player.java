@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 
 public class Player extends Actor {
-    private ArrayList<ItemDAO> itemDAOs;
 
     private String name;
 

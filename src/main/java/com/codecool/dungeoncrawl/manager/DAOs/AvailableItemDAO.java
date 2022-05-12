@@ -3,8 +3,8 @@ package com.codecool.dungeoncrawl.manager.DAOs;
 public class AvailableItemDAO {
     private int id;
     private String type;
-    private int posX;
-    private int posY;
+    private final int posX;
+    private final int posY;
 
     private int gameID;
 
@@ -34,16 +34,8 @@ public class AvailableItemDAO {
         return posX;
     }
 
-    public void setPosX(int posX) {
-        this.posX = posX;
-    }
-
     public int getPosY() {
         return posY;
-    }
-
-    public void setPosY(int posY) {
-        this.posY = posY;
     }
 
     public int getGameID() {
