@@ -13,8 +13,9 @@ public class Cell implements Drawable {
         this.tempItem = tempItem;
     }
 
-    private GameMap gameMap;
-    private int x, y;
+    private final GameMap gameMap;
+    private final int x;
+    private final int y;
 
     Cell(GameMap gameMap, int x, int y, CellType type) {
         this.gameMap = gameMap;

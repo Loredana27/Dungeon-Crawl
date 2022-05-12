@@ -59,6 +59,10 @@ public abstract class Actor implements Drawable{
                             }
                             break;
                         case "skeleton":
+                        case "soldier":
+                        case "bat":
+                        case "bear":
+                        case "farmer":
                             if (this instanceof Player)
                                 this.isAttacked(nextCell.getActor().getAttack());
                             break;
@@ -79,38 +83,37 @@ public abstract class Actor implements Drawable{
                     nextCell.setActor(this);
                     cell = nextCell;
                 }
-        }catch (IndexOutOfBoundsException ignored){}
-        catch (NullPointerException ignored){}
+        }catch (IndexOutOfBoundsException | NullPointerException ignored){}
     }
 
     public void pickupItem(){
         try {
             switch (cell.getTempItem()) {
-                case "heal":
-                    //                addItem("heal");
+                case "heal" -> {
+                    addItem("heal");
                     health += 10;
                     cell.cleanTempItem();
-                    break;
-                case "key":
+                }
+                case "key" -> {
                     addItem("key");
                     cell.cleanTempItem();
-                    break;
-                case "sword":
+                }
+                case "sword" -> {
                     addItem("sword");
                     attack += 3;
                     cell.cleanTempItem();
-                    break;
-                case "treasure":
+                }
+                case "treasure" -> {
                     addItem("bigsword");
                     attack += 7;
                     health += 10;
                     removeItem("treasure key");
                     cell.cleanTempItem();
-                    break;
-                case "treasure key":
+                }
+                case "treasure key" -> {
                     addItem("treasure key");
                     cell.cleanTempItem();
-                    break;
+                }
             }
         }catch (NullPointerException ignored){}
     }
@@ -124,12 +127,7 @@ public abstract class Actor implements Drawable{
                         Actor enemy = cell.getNeighbor(dx, dy).getActor();
                         if (enemy != null)
                             switch (enemy.getTileName()) {
-                                case "skeleton":
-                                case "bat":
-                                case "bear":
-                                case "farmer":
-                                case "soldier":
-                                    enemies.add((Enemy) enemy);
+                                case "skeleton", "bat", "bear", "farmer", "soldier" -> enemies.add((Enemy) enemy);
                             }
                     }catch (IndexOutOfBoundsException | NullPointerException ignored){}
                 }
@@ -213,12 +211,7 @@ public abstract class Actor implements Drawable{
         return enemies;
     }
 
-
-
     public boolean checkForKey(){
         return items.containsKey("key");
-    }
-    public boolean checkForTresuryKey(){
-        return items.containsKey("tresure key");
     }
 }

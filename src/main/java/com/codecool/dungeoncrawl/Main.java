@@ -45,9 +45,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Main extends Application {
 
     PlayerDAO playerDAO;
-    EnemyDAO enemyDAO;
-    ItemDAO itemDAO;
-    AvailableItemDAO availableItemDAO;
 
     GameDAO gameDAO;
     JsonGameDAO jsonGameDAO;
@@ -760,8 +757,6 @@ public class Main extends Application {
                 map.getHeight() * Tiles.TILE_WIDTH);
         context = canvas.getGraphicsContext2D();
 
-
-
         map.cleanActors();
         Player player = new Player(map.getCell(gameDAO.getPlayer().getPosX(), gameDAO.getPlayer().getPosY()));
         map.setPlayer(player);
@@ -797,56 +792,52 @@ public class Main extends Application {
                 }
             }
         });
-        player.setName("dev");
         gameDAO.getItems().forEach(e->{
             Cell cell = map.getCell(map.getPlayer().getX(), map.getPlayer().getY());
-            map.getPlayer().move(0,1);
             switch (e.getType()) {
-                case "heal" -> cell.setActor(new HealPotion(cell));
-                case "key" -> cell.setActor(new Key(cell));
-                case "sword" -> cell.setActor(new Sword(cell));
+                case "heal" -> cell.setTempItem(new HealPotion(cell));
+                case "key" -> cell.setTempItem(new Key(cell));
+                case "sword" -> cell.setTempItem(new Sword(cell));
                 case "treasure" -> {
                     cell.setActor(new Treasure(cell));
                     map.getPlayer().addItem("treasure key");
                 }
-                case "treasure key" -> cell.setActor(new TreasureKey(cell));
+                case "treasure key" -> cell.setTempItem(new TreasureKey(cell));
             }
-            map.getPlayer().move(0,-1);
+            cell.setActor(map.getPlayer());
             map.getPlayer().pickupItem();
         });
-        map.getPlayer().setName(gameDAO.getPlayer().getName());
 
         gameDAO.getEnemies().forEach(e -> {
             Cell cell = map.getCell(e.getPosX(),e.getPosY() );
-            switch (e.getType()){
-                case "skeleton":
+            switch (e.getType()) {
+                case "skeleton" -> {
                     Skeleton skeleton = new Skeleton(cell);
                     cell.setActor(skeleton);
                     map.addAI(skeleton);
-                    break;
-                case "farmer":
+                }
+                case "farmer" -> {
                     Farmer farmer = new Farmer(cell);
                     cell.setActor(farmer);
                     map.addAI(farmer);
-                    break;
-                case "soldier":
+                }
+                case "soldier" -> {
                     Soldier soldier = new Soldier(cell);
                     cell.setActor(soldier);
                     map.addAI(soldier);
-                    break;
-                case "bear":
+                }
+                case "bear" -> {
                     Bear bear = new Bear(cell);
                     cell.setActor(bear);
                     map.addAI(bear);
-                    break;
-                case "bat":
+                }
+                case "bat" -> {
                     Bat bat = new Bat(cell);
                     cell.setActor(bat);
                     map.addAI(bat);
-                    break;
+                }
             }
         });
-
         gameRunning = true;
 
         uiContainer.setFocusTraversable(true);
