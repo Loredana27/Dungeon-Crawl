@@ -1,0 +1,23 @@
+.fileNotFoundPane{
+    -fx-background-image: url("/fileNotFound.png");
+    -fx-max-width: 690;
+    -fx-min-width: 690;
+    -fx-max-height: 240;
+    -fx-min-height: 240;
+}
+
+.fileNotFoundPane Button{
+    -fx-background-radius: 15;
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+    -fx-effect: dropshadow(three-pass-box, white, 10, 0, 0, 0);
+    -fx-end-margin: 360;
+    -fx-font-size: 15;
+    -fx-text-fill: #131313;
+    -fx-font-weight: bold;
+}
+
+.fileNotFoundPane Button:hover{
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 0, 0.43), 10, 0, 0, 0);
+    -fx-text-fill: #858585;
+}

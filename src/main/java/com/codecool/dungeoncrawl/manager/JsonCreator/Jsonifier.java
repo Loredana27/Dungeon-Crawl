@@ -40,7 +40,7 @@ public class Jsonifier {
         }
     }
 
-    public GameDAO loadGame(){
+    public GameDAO loadGame() throws IOException {
         JSONParser jsonParser = new JSONParser();
         String path = ".\\saves\\" + file + ".json";
         try(FileReader in = new FileReader(path)){
@@ -93,7 +93,7 @@ public class Jsonifier {
                     Integer.parseInt(String.valueOf(player.get("posY")))
             );
             return new GameDAO(name,actualMap,playerDAO,enemyDAOS,itemDAOS,availableItemDAOS);
-        } catch (IOException | ParseException e) {
+        } catch (ParseException e){
             throw new RuntimeException(e);
         }
     }

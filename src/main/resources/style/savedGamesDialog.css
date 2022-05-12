@@ -1,0 +1,61 @@
+.dialogScrollPane{
+    -fx-background-image: url("/savedGames.png");
+    -fx-padding: 93;
+    -fx-min-width: 1000;
+    -fx-max-width: 1000;
+    -fx-min-height: 500;
+    -fx-max-height: 500;
+}
+
+.scroll-bar:vertical .thumb{
+    -fx-background-color: derive(#4651e5,90%);
+    -fx-background-insets: 2, 0, 0;
+    -fx-background-radius: 0.5em;
+    -fx-pref-height: 10px;
+}
+
+.scroll-bar:horizontal .thumb{
+    -fx-background-color: derive(#4651e5,90%);
+    -fx-background-insets: 2, 0, 0;
+    -fx-background-radius: 0.5em;
+    -fx-pref-height: 10px;
+}
+
+.scroll-bar{
+    -fx-background-color: #2c0df1;
+}
+
+.dialogScrollPane .dialogGridPane{
+    -fx-background-color: #2b1aa4;
+    -fx-padding: 10;
+    -fx-effect: innershadow(three-pass-box, #ffffff, 10, 0, 0, 0);
+    -fx-border-color: black;
+    -fx-max-width: 801;
+    -fx-min-width: 801;
+    -fx-min-height: 400;
+    -fx-max-height: 400;
+    -fx-vgap: 10;
+    -fx-hgap: 30;
+}
+
+.dialogScrollPane .dialogGridPane Label{
+    -fx-text-fill: black;
+    -fx-font-size: 20;
+}
+
+.dialogScrollPane Button{
+    -fx-background-radius: 15;
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+    -fx-effect: dropshadow(three-pass-box, white, 10, 0, 0, 0);
+    -fx-end-margin: 360;
+    -fx-font-size: 15;
+    -fx-text-fill: #131313;
+    -fx-font-weight: bold;
+}
+
+.dialogScrollPane Button:hover{
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 0, 0, 0.6), 10, 0, 0, 0);
+    -fx-text-fill: #858585;
+}
+

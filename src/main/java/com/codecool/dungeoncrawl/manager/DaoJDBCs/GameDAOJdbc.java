@@ -105,27 +105,39 @@ public class GameDAOJdbc {
             if (!rs.next()) {
                 return null;
             }
-            GameDAO game = new GameDAO(rs.getString(1), rs.getInt(2), playerDAOJdbc.getPlayer(id), enemyDAOJdbc.getAllEnemy(id), itemDAOJdbc.getAllItems(id), availableItemDAOJdbc.getAllAvailableItems(id));
+            GameDAO game = new GameDAO(
+                    rs.getString(1),
+                    rs.getInt(2),
+                    playerDAOJdbc.getPlayer(id),
+                    enemyDAOJdbc.getAllEnemy(id),
+                    itemDAOJdbc.getAllItems(id),
+                    availableItemDAOJdbc.getAllAvailableItems(id)
+            );
             game.setId(id);
             game.setSaveDate(rs.getDate(3));
             return game;
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
-//            throw new RuntimeException("Error!!!" , e);
+            throw new RuntimeException("Error!!!" , e);
         }
     }
 
     public ArrayList<GameDAO> getAllGame(){
         try (Connection conn = dataSource.getConnection()) {
-            String sql = "SELECT name, actualmap, savedate FROM game";
+            String sql = "SELECT id, name, actualmap, savedate FROM game";
             ResultSet rs = conn.createStatement().executeQuery(sql);
             ArrayList<GameDAO> gameDAOs= new ArrayList<>();
             while (rs.next()) {
-                GameDAO gameDAO = new GameDAO(rs.getNString("name"), rs.getInt(2),playerDAOJdbc.getPlayer(rs.getInt(1)), enemyDAOJdbc.getAllEnemy(rs.getInt(1)), itemDAOJdbc.getAllItems(rs.getInt(1)),availableItemDAOJdbc.getAllAvailableItems(rs.getInt(1)));
-                gameDAO.setId(gameDAO.getId());
-                gameDAO.setSaveDate(rs.getDate(3));
+                GameDAO gameDAO = new GameDAO(
+                        rs.getString(2),
+                        rs.getInt(3),
+                        playerDAOJdbc.getPlayer(rs.getInt(1)),
+                        enemyDAOJdbc.getAllEnemy(rs.getInt(1)),
+                        itemDAOJdbc.getAllItems(rs.getInt(1)),
+                        availableItemDAOJdbc.getAllAvailableItems(rs.getInt(1)));
+                gameDAO.setId(rs.getInt(1));
+                gameDAO.setSaveDate(rs.getDate(4));
                 gameDAOs.add(gameDAO);
             }
             return gameDAOs;
@@ -134,13 +146,6 @@ public class GameDAOJdbc {
             throw new RuntimeException("Error!!!" , e);
         }
     }
-
-
-
-
-
-
-
 
 
 }

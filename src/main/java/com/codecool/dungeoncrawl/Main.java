@@ -25,8 +25,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
@@ -34,6 +33,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -337,7 +337,7 @@ public class Main extends Application {
 
         saveGameDB.setOnAction(e-> saveDatabaseGame());
         saveGameFile.setOnAction(e-> saveFileGame());
-        loadDBGame.setOnAction(e-> loadDatabaseGame(8));
+        loadDBGame.setOnAction(e-> showSavedGamesDialog());
         loadFileGame.setOnAction(e-> loadFileGame());
 
         exit.setOnAction(e-> System.exit(0));
@@ -650,8 +650,6 @@ public class Main extends Application {
             if (gameDAOJdbc == null) initGameJdbc();
             gameDAOJdbc.insertGame(gameDAO);
         }
-
-
     }
 
     private void initGameDao(String saveName){
@@ -676,9 +674,35 @@ public class Main extends Application {
         TextInputDialog inputDialog = new TextInputDialog();
         inputDialog.initOwner(mainStage);
         inputDialog.setGraphic(null);
-        inputDialog.setTitle("Game name needed!");
+        inputDialog.setTitle("Save name needed!");
         inputDialog.setHeaderText(null);
-        inputDialog.setContentText("Please insert your game: ");
+        inputDialog.setContentText("Please insert your \nsave name: ");
+        inputDialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/getName.css")).toExternalForm());
+        inputDialog.getDialogPane().getStyleClass().add("getInputPane");
+        inputDialog.getEditor().getStyleClass().add("textInput");
+        inputDialog.getDialogPane().getButtonTypes().clear();
+        ButtonType buttonTypeOK = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        inputDialog.getDialogPane().getButtonTypes().add(buttonTypeOK);
+        inputDialog.getDialogPane().getButtonTypes().add(buttonTypeCancel);
+        Optional<String> result = inputDialog.showAndWait();
+        if(result.isPresent() && !result.get().equals("")){
+            try {
+                return inputDialog.getEditor().getText();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private String getFileName(){
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.initOwner(mainStage);
+        inputDialog.setGraphic(null);
+        inputDialog.setTitle("File name needed!");
+        inputDialog.setHeaderText(null);
+        inputDialog.setContentText("Please insert your \nsave file name: ");
         inputDialog.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/getName.css")).toExternalForm());
         inputDialog.getDialogPane().getStyleClass().add("getInputPane");
         inputDialog.getEditor().getStyleClass().add("textInput");
@@ -697,6 +721,67 @@ public class Main extends Application {
 
         }
         return null;
+    }
+
+    private void showSavedGamesDialog(){
+        Stage savedGamesStage = new Stage();
+
+        GridPane dialogGridPane = new GridPane();
+        dialogGridPane.getStyleClass().add("dialogGridPane");
+
+        if (gameDAOJdbc == null) initGameJdbc();
+        ArrayList<GameDAO> gameDAOS = gameDAOJdbc.getAllGame();
+
+        ScrollPane dialogScrollPane = new ScrollPane(dialogGridPane);
+        dialogScrollPane.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/savedGamesDialog.css")).toExternalForm());
+        dialogScrollPane.setFitToHeight(true);
+        dialogScrollPane.setFitToWidth(false);
+        dialogScrollPane.getStyleClass().add("dialogScrollPane");
+
+        AtomicInteger row = new AtomicInteger(1);
+        dialogGridPane.add(new Label("Save name"),0,0);
+        dialogGridPane.add(new Label("Player name"),1,0);
+        dialogGridPane.add(new Label("Save date"),2,0);
+        dialogGridPane.add(new Label("Current level"),3,0);
+        gameDAOS.forEach(game ->{
+            dialogGridPane.add(new Label(game.getName()),0 ,row.get());
+            String playerName;
+            try{
+                playerName = game.getPlayer().getName();
+            }catch (NullPointerException e){
+                playerName = "";
+            }
+            dialogGridPane.add(new Label(playerName),1,row.get());
+            dialogGridPane.add(new Label(String.valueOf(game.getSaveDate())),2,row.get());
+            dialogGridPane.add(new Label(String.valueOf(game.getActualMap())),3,row.get());
+            Button loadButton = new Button("Load Game");
+            loadButton.setOnAction(e -> {
+                savedGamesStage.close();
+                loadDatabaseGame(game.getId());
+            });
+            dialogGridPane.add(loadButton,4,row.get());
+            Button deleteButton = new Button("Delete Game");
+            deleteButton.setOnAction(e -> {
+                if (gameDAOJdbc == null) initGameJdbc();
+                gameDAOJdbc.deleteGame(game.getId());
+                savedGamesStage.close();
+                showSavedGamesDialog();
+            });
+            dialogGridPane.add(deleteButton,5,row.get());
+            row.getAndIncrement();
+        });
+
+
+        Scene dialogScene = new Scene(dialogScrollPane);
+        savedGamesStage.setScene(dialogScene);
+        savedGamesStage.initOwner(mainStage);
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.png")));
+        savedGamesStage.getIcons().add(icon);
+        savedGamesStage.setTitle("Saved games");
+        savedGamesStage.setResizable(false);
+        savedGamesStage.show();
+        savedGamesStage.setX(getScreenWidth()/2 - savedGamesStage.getWidth()/2);
+        savedGamesStage.setY(getScreenHeight()/2 - savedGamesStage.getHeight()/2);
     }
 
     private void loadDatabaseGame(int id){
@@ -724,7 +809,7 @@ public class Main extends Application {
     }
 
     private void saveFileGame(){
-        String saveName = getName();
+        String saveName = getFileName();
         if(saveName != null){
             initGameDao(saveName);
             try{
@@ -739,11 +824,12 @@ public class Main extends Application {
 
     private void loadFileGame(){
         try {
-            Jsonifier jsonifier = new Jsonifier("desv");
+            String saveName = getFileName();
+            Jsonifier jsonifier = new Jsonifier(saveName);
             gameDAO = jsonifier.loadGame();
             loadGame();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e){
+            showFileNotFound();
         }
     }
 
@@ -846,6 +932,26 @@ public class Main extends Application {
         canvas.setFocusTraversable(true);
         borderPane.setCenter(canvas);
         refresh();
+    }
+
+    private void showFileNotFound(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.initOwner(mainStage);
+        alert.setHeaderText(null);
+        alert.setGraphic(null);
+        alert.setTitle("File not found!");
+        alert.getDialogPane().getStyleClass().add("fileNotFoundPane");
+        alert.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style/fileNotFound.css")).toExternalForm());
+
+        alert.getButtonTypes().clear();
+        ButtonType buttonTypeOK = new ButtonType("Close", ButtonBar.ButtonData.OK_DONE);
+        alert.getButtonTypes().add(buttonTypeOK);
+
+
+        alert.show();
+
+        alert.setX(getScreenWidth()/2 - alert.getWidth()/2);
+        alert.setY(getScreenHeight()/2 - alert.getHeight()/2);
     }
 
     private double getScreenWidth(){

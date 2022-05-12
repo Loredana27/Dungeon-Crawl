@@ -86,4 +86,18 @@ public class GameDAO {
     public void setSaveDate(Date saveDate) {
         this.saveDate = saveDate;
     }
+
+    @Override
+    public String toString() {
+        return "GameDAO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", actualMap=" + actualMap +
+                ", saveDate=" + saveDate +
+                ", player=" + player +
+                ", enemies=" + enemies +
+                ", items=" + items +
+                ", availableItems=" + availableItems +
+                '}';
+    }
 }
