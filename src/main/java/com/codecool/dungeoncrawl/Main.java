@@ -840,6 +840,7 @@ public class Main extends Application {
             case 2 -> map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(secondMap));
             case 3 -> map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
         }
+        actualMap = gameDAO.getActualMap();
         canvas = new Canvas(
                 map.getWidth() * Tiles.TILE_WIDTH,
                 map.getHeight() * Tiles.TILE_WIDTH);
