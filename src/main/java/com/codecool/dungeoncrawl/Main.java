@@ -703,17 +703,57 @@ public class Main extends Application {
     private void loadDatabaseGame(int id){
         if (gameDAOJdbc == null) initGameJdbc();
         gameDAO = gameDAOJdbc.getGame(id);
+        loadGame();
+    }
+
+    private void initJsonGameDao(String saveName){
+        ArrayList<AvailableItemDAO> availableItemDAOs = map.getAllAvailableItems();
+        ArrayList<ItemDAO> itemDAOs = map.getPlayer().getAllItems();
+        ArrayList<EnemyDAO> enemyDAOs = new ArrayList<>();
+        playerDAO = new PlayerDAO(nameLabel.getText(), map.getPlayer().getX(), map.getPlayer().getY());
+        map.getGameAI().forEach(enemy ->
+                enemyDAOs.add(new EnemyDAO(enemy.getTileName(), enemy.getX(), enemy.getY()))
+        );
+        jsonGameDAO = new JsonGameDAO(
+                saveName,
+                actualMap,
+                playerDAO,
+                enemyDAOs,
+                itemDAOs,
+                availableItemDAOs
+        );
+    }
+
+    private void saveFileGame(){
+        String saveName = getName();
+        if(saveName != null){
+            initGameDao(saveName);
+            try{
+                Jsonifier jsonifier = new Jsonifier(saveName);
+                initJsonGameDao(saveName);
+                jsonifier.saveGame(jsonGameDAO);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void loadFileGame(){
+        try {
+            Jsonifier jsonifier = new Jsonifier("desv");
+            gameDAO = jsonifier.loadGame();
+            loadGame();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void loadGame(){
         initUI();
-        switch (gameDAO.getActualMap()){
-            case 1:
-                map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
-                break;
-            case 2:
-                map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(secondMap));
-                break;
-            case 3:
-                map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
-                break;
+        switch (gameDAO.getActualMap()) {
+            case 1 -> map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(firstMap));
+            case 2 -> map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(secondMap));
+            case 3 -> map = MapLoader.loadMap(MapLoader.class.getResourceAsStream(thirdMap));
         }
         canvas = new Canvas(
                 map.getWidth() * Tiles.TILE_WIDTH,
@@ -729,55 +769,47 @@ public class Main extends Application {
         nameLabel.setText(map.getPlayer().getName());
         gameDAO.getAvailableItems().forEach(e -> {
             Cell cell = map.getCell(e.getPosX(), e.getPosY());
-            switch (e.getType()){
-                case "heal":
+            switch (e.getType()) {
+                case "heal" -> {
                     HealPotion heal = new HealPotion(cell);
                     cell.setActor(heal);
                     map.addItem(heal.getTileName());
-                    break;
-                case "key":
+                }
+                case "key" -> {
                     Key key = new Key(cell);
                     cell.setActor(key);
                     map.addItem(key.getTileName());
-                    break;
-                case "sword":
+                }
+                case "sword" -> {
                     Sword sword = new Sword(cell);
                     cell.setActor(sword);
                     map.addItem(sword.getTileName());
-                    break;
-                case "treasure":
+                }
+                case "treasure" -> {
                     Treasure treasure = new Treasure(cell);
                     cell.setActor(treasure);
                     map.addItem(treasure.getTileName());
-                    break;
-                case "treasure key":
+                }
+                case "treasure key" -> {
                     TreasureKey tresureKey = new TreasureKey(cell);
                     cell.setActor(tresureKey);
-                    map.addItem(tresureKey.getTileName() );
-                    break;
+                    map.addItem(tresureKey.getTileName());
                 }
+            }
         });
         player.setName("dev");
         gameDAO.getItems().forEach(e->{
             Cell cell = map.getCell(map.getPlayer().getX(), map.getPlayer().getY());
             map.getPlayer().move(0,1);
-            switch (e.getType()){
-                case "heal":
-                   cell.setActor(new HealPotion(cell));
-                    break;
-                case "key":
-                    cell.setActor(new Key(cell));
-                    break;
-                case "sword":
-                    cell.setActor(new Sword(cell));
-                    break;
-                case "treasure":
+            switch (e.getType()) {
+                case "heal" -> cell.setActor(new HealPotion(cell));
+                case "key" -> cell.setActor(new Key(cell));
+                case "sword" -> cell.setActor(new Sword(cell));
+                case "treasure" -> {
                     cell.setActor(new Treasure(cell));
                     map.getPlayer().addItem("treasure key");
-                    break;
-                case "treasure key":
-                    cell.setActor(new TreasureKey(cell));
-                    break;
+                }
+                case "treasure key" -> cell.setActor(new TreasureKey(cell));
             }
             map.getPlayer().move(0,-1);
             map.getPlayer().pickupItem();
@@ -821,43 +853,6 @@ public class Main extends Application {
         canvas.setFocusTraversable(true);
         borderPane.setCenter(canvas);
         refresh();
-
-    }
-
-    private void initJsonGameDao(String saveName){
-        ArrayList<AvailableItemDAO> availableItemDAOs = map.getAllAvailableItems();
-        ArrayList<ItemDAO> itemDAOs = map.getPlayer().getAllItems();
-        ArrayList<EnemyDAO> enemyDAOs = new ArrayList<>();
-        playerDAO = new PlayerDAO(nameLabel.getText(), map.getPlayer().getX(), map.getPlayer().getY());
-        map.getGameAI().forEach(enemy ->
-                enemyDAOs.add(new EnemyDAO(enemy.getTileName(), enemy.getX(), enemy.getY()))
-        );
-        jsonGameDAO = new JsonGameDAO(
-                saveName,
-                actualMap,
-                playerDAO,
-                enemyDAOs,
-                itemDAOs,
-                availableItemDAOs
-        );
-    }
-
-    private void saveFileGame(){
-        String saveName = getName();
-        if(saveName != null){
-            initGameDao(saveName);
-            try{
-                Jsonifier jsonifier = new Jsonifier(saveName);
-                initJsonGameDao(saveName);
-                jsonifier.saveGame(jsonGameDAO);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void loadFileGame(){
-
     }
 
     private double getScreenWidth(){

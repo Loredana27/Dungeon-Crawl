@@ -6,9 +6,8 @@ import com.codecool.dungeoncrawl.manager.DAOs.ItemDAO;
 import com.codecool.dungeoncrawl.manager.DAOs.PlayerDAO;
 
 
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
@@ -30,14 +29,14 @@ public class JsonGameDAO {
         this.enemies = enemies;
         this.items = items;
         this.availableItems = availableItems;
-        this.saveDate = new java.sql.Date(System.currentTimeMillis());
+        this.saveDate = new Date(System.currentTimeMillis());
     }
 
     public String toJson(){
         JSONObject game = new JSONObject();
         game.put("name", name);
-        game.put("actualMap", actualMap);
-        game.put("saveDate", String.valueOf(saveDate));
+        game.put("actualMap", String.valueOf(actualMap));
+//        game.put("saveDate", saveDate);
         JSONObject playerJson = new JSONObject();
         playerJson.put("name",player.getName());
         playerJson.put("posX",player.getPosX());
@@ -72,5 +71,18 @@ public class JsonGameDAO {
                 .replace(",",",\n")
                 .replace("{","{\n")
                 .replace("}","\n}\n");
+    }
+
+    @Override
+    public String toString() {
+        return "JsonGameDAO{" +
+                "name='" + name + '\'' +
+                ", actualMap=" + actualMap +
+                ", saveDate=" + saveDate +
+                ", player=" + player +
+                ", enemies=" + enemies +
+                ", items=" + items +
+                ", availableItems=" + availableItems +
+                '}';
     }
 }
