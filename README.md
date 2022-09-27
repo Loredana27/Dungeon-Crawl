@@ -18,7 +18,6 @@ Video games and board games which predominantly feature dungeon crawl elements a
 
 ## Tech
 
-### Server (Back-End)
 #### Programming language
 - [Java](https://www.java.com/)
 - [JavaFX](https://openjfx.io/)
