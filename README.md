@@ -29,3 +29,15 @@ Video games and board games which predominantly feature dungeon crawl elements a
 
 #### Project management
 - [Maven](https://maven.apache.org/) - project management and comprehension tool
+
+
+## Sample photos
+<div style="display: grid; grid-template-columns: auto auto auto;column-gap: 10px;row-gap: 10px">
+    <img src="https://raw.githubusercontent.com/SidorAndrei/Dungeon-Crawl/development/assets/mainpage.png" height="auto" width="100%">
+    <img src="https://raw.githubusercontent.com/SidorAndrei/Dungeon-Crawl/development/assets/menu.png" height="auto" width="100%">
+    <img src="https://raw.githubusercontent.com/SidorAndrei/Dungeon-Crawl/development/assets/saves.png" height="auto" width="100%">
+    <img src="https://raw.githubusercontent.com/SidorAndrei/Dungeon-Crawl/development/assets/json_save.png" height="auto" width="100%">
+    <img src="https://raw.githubusercontent.com/SidorAndrei/Dungeon-Crawl/development/assets/first_map.png" height="auto" width="100%">
+    <img src="https://raw.githubusercontent.com/SidorAndrei/Dungeon-Crawl/development/assets/second_map.png" height="auto" width="100%">
+    <img src="https://raw.githubusercontent.com/SidorAndrei/Dungeon-Crawl/development/assets/Game%20Over.png" height="auto" width="100%">
+</div>
